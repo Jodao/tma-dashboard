@@ -3,7 +3,7 @@ apiVersion: apps/v1
 metadata:
   name: my-react-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: my-react-app
@@ -14,11 +14,11 @@ spec:
     spec:
       containers:
         - name: my-react-app
-          image: localhost:5000/my-react-app
-          imagePullPolicy: Always
+          image: jodao/tma-dashboard:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
-      restartPolicy: Always
+      #restartPolicy: Always
       
 kind: Service
 apiVersion: v1

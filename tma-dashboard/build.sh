@@ -1,1 +1,1 @@
-docker build -t tma-dashboard .
+docker build -t jodao/tma-dashboard .
