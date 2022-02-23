@@ -32,6 +32,6 @@ spec:
     - port: 80
       targetPort: 80
       protocol: TCP
-      nodePort: 80
+      nodePort: 31000
   selector:
     app: my-react-app
