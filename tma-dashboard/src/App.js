@@ -1,31 +1,34 @@
 import { Button } from 'semantic-ui-react'
-import axios from 'axios';
-//import { useEffect } from 'react';
+import ApiModule from "./api/ApiModule";
+import NavBar from "./components/layout/NavBar";
 
 function App() {
-  const baseURL = "http://54.194.189.180:32026/getpartners";
-
-  async function request(){
-    var obj = await axios.get(baseURL)
-    console.log(obj.data)
-  }
-
+  
  /* useEffect(()=> {
-    request();
-    console.log("segundo");
+    console.log("useEffect function");
   },[]);
 */
+  var output 
 
   function handler (ev){
     ev.preventDefault()
-    request()
+    var res = ApiModule().request()
+    res.then((response) => output = response.data)
+    console.log(output)
+  }
+
+  function handler2 (ev){
+    ev.preventDefault()
+    console.log(output)
   }
 
   return (
     <div>
+      <NavBar></NavBar>
       <h1>Hello!</h1>
 
       <Button onClick={handler}>Primary </Button>
+      <Button onClick={handler2}>Secondary </Button>
     </div>
   );
 }
