@@ -19,7 +19,9 @@ spec:
           ports:
             - containerPort: 80
       #restartPolicy: Always
-      
+
+---
+
 kind: Service
 apiVersion: v1
 metadata:
@@ -30,6 +32,6 @@ spec:
     - port: 80
       targetPort: 80
       protocol: TCP
-      nodePort: 31000
+      nodePort: 80
   selector:
     app: my-react-app
