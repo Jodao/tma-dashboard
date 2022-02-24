@@ -1,13 +1,13 @@
 import { Button } from 'semantic-ui-react'
 import ApiModule from "./api/ApiModule";
 import NavBar from "./components/layout/NavBar";
+import {Route, Routes,Switch} from 'react-router-dom';
+import ListMetricsPage from './pages/ListMetricsPage';
+import ListQualityModelsPage from './pages/ListQualityModelsPage';
+import HomePage from './pages/HomePage'
 
 function App() {
   
- /* useEffect(()=> {
-    console.log("useEffect function");
-  },[]);
-*/
   var output 
 
   function handler (ev){
@@ -24,8 +24,20 @@ function App() {
 
   return (
     <div>
-      <NavBar></NavBar>
-      <h1>Hello!</h1>
+      <NavBar/>     
+      <Switch>
+        <Route path="/" exact>
+          <HomePage/>
+        </Route>
+        
+        <Route path="/getMetrics">
+          <ListMetricsPage/>
+        </Route>
+
+        <Route path="/getQualityModels">
+          <ListQualityModelsPage/>
+        </Route>
+      </Switch>
 
       <Button onClick={handler}>Primary </Button>
       <Button onClick={handler2}>Secondary </Button>
