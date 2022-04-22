@@ -1,39 +1,57 @@
-import { useState } from 'react'
 import { Menu, Segment, Icon, Grid } from 'semantic-ui-react'
-import {Link} from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function NavBar() {
-  const [activeItem, setActiveItem] = useState("home");
+
+  let navigate = useNavigate();
+
+  const { pathname } = useLocation();
 
   function handleItemClick (e, { name }){
-    setActiveItem(name)
+    switch (name) {
+      case 'home':
+        navigate("/");
+        break;
+      case 'metrics':
+        navigate("/getMetrics")
+        break;
+      case 'qms':
+        navigate("/getQualityModels")
+        break;
+      case 'resources':
+        navigate("/getResources")
+        break;
+      default:
+        console.log("Something went wrong");
+    }
   }
 
+  //ICONS THAT MAY BE NICE TO USE -> eye, HEARTBEAT, database, tasks, cogs, stethoscope, user md, band aid/ wrench,
+  //dollar,euro, privacy, spy, chart bar outline
     return (
-      <Grid centered>
-        <Segment inverted compact>
-          <Menu icon='labeled'  compact inverted pointing secondary>
-            <Link to="/" >
-              <Menu.Item name='home' active={activeItem === 'home'} onClick={handleItemClick}>
-                <Icon name='gamepad' />
-                Home
-              </Menu.Item>
-            </Link>
-            <Link to="/getMetrics">
-              <Menu.Item name='metrics' active={activeItem === 'metrics'} onClick={handleItemClick}>
-                <Icon name='gamepad' />
-                Metrics
-              </Menu.Item>
-            </Link>
-            <Link to="/getQualityModels">
-              <Menu.Item name='qms' active={activeItem === 'qms'}onClick={handleItemClick}>
-                <Icon name='gamepad' />
-                Quality Models
-              </Menu.Item>
-            </Link>
-          </Menu>
-        </Segment>
-      </Grid>
+      <div style={{textAlign: "center" }}>
+        <Menu icon='labeled'  pointing secondary compact>
+          <Menu.Item name='home' active={ pathname === '/'} onClick={handleItemClick}>
+            <Icon name='dashboard' />
+            Home
+          </Menu.Item>
+
+          <Menu.Item name='metrics' active={pathname === '/getMetrics'} onClick={handleItemClick}>
+            <Icon name='info' />
+            Metrics
+          </Menu.Item>
+
+          <Menu.Item name='qms' active={pathname === '/getQualityModels'} onClick={handleItemClick}>
+            <Icon name='balance' />
+            Quality Models
+          </Menu.Item>
+
+          <Menu.Item name='resources' active={pathname === '/getResources'} onClick={handleItemClick}>
+            <Icon name='cloud' />
+            Resources
+          </Menu.Item>
+        </Menu>
+      </div>
     )
 }
 
