@@ -264,7 +264,6 @@ function ApiModule() {
     //axios.get() returns a promise, thereby when the response is received it is treated
     return axios.put(endpoint,body).then((res) => 
         {
-          console.log(res)
           return res.status
         }
       ).catch(function (error) 

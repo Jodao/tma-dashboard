@@ -131,7 +131,7 @@ function HomePage(){
             let resStatus = await ApiModule().replacePlotConfig(requestBody)
 
             //if res is successful handlePlotData
-            if(resStatus >= 200 && resStatus < 300){
+            if(resStatus == 200){
                 handlePlotData(configObjectTemp, atts.plotindex)
             }
         }
