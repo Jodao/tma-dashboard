@@ -10,7 +10,10 @@ function ListQualityModelsPage(props){
     let navigate = useNavigate();
     const currpath = props["currpath"]
     
-    const tableHeaders = ["qualityModelId","modelName","modelDescriptionReference","businessThreshold","metricId","metricName"] 
+    const tableBodyJSONProps = ["qualityModelId","modelName","modelDescriptionReference","businessThreshold",
+    "metricId","metricName"]; 
+    const tableHeaders = ["Id", "Name", "Description Reference", "Business Threshold", "Metric Id", "Metric Name"];
+
     
     const [apiData, setAPIData] = useState(null);
     const [apiDataProcessed, setAPIDataProcessed] = useState(false);
@@ -81,7 +84,7 @@ function ListQualityModelsPage(props){
         <div>
             <Grid centered>
             <Grid.Row >
-                <Grid.Column width={12}>
+                <Grid.Column width={15}>
                 <Divider section horizontal>
                     <Header as="h1" textAlign="center">List of Quality Models</Header> 
                 </Divider>
@@ -92,36 +95,39 @@ function ListQualityModelsPage(props){
             {
             //if apiData is null, then it is because the response from the API hasn't arrived
             apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
-            <Container> 
-                <Grid centered> 
-                    <Grid.Row centered>
-                        <Button onClick={createQualityModelButtonHandler}> Create Quality Model </Button>
-                    </Grid.Row>
-                    
-                    <Segment>
-                        <Form onSubmit={filterSubmitHandler}> 
-                            <Form.Group>
-                                <Form.Input name = "qualityModelsFilter" onChange={filterChangeHandler} fluid label="Filter by name or id"/>
-                                <Form.Input name = "metricsFilter" onChange={filterChangeHandler} fluid label="Filter by metric's name or id"/>
-                                <Button type='submit' icon>
+                <Grid columns={1} centered> 
+                    <Grid.Column>
+                        <Container>
+                            <Form onSubmit={filterSubmitHandler}> 
+                                <Form.Group inline>
+                                    <Form.Input name="qualityModelsFilter" onChange={filterChangeHandler} label="Filter by name or id"/>
+                                    <Form.Input name = "metricsFilter" onChange={filterChangeHandler} label="Filter by Metric's name or id"/>
+                                    <Button color='blue' type='submit' icon>
                                         Filter
                                         <Icon name='filter' />
-                                </Button>
-                            </Form.Group>
-                        </Form>
-                        { 
-                        apiDataProcessed === false ? <Loader active inline='centered'> Retrieving content </Loader>:
-                        <Grid.Row centered>
-                            <Table textAlign="center" compact collapsing  celled selectable> 
+                                    </Button>
+                                    <Button color='blue' 
+                                        style={{marginLeft: "auto"}} 
+                                        floated='right' 
+                                        onClick={createQualityModelButtonHandler}
+                                    > 
+                                        Create Quality Model 
+                                    </Button>
+                                </Form.Group>
+                                
+                            </Form>
+                            { 
+                            apiDataProcessed === false ? <Loader active inline='centered'> Retrieving content </Loader>:
+
+                            <Table textAlign="center" compact celled selectable> 
                                 <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
-                                <TableBody baserowpathlink={currpath} data={apiData} tableHeaders = {tableHeaders}></TableBody>
+                                <TableBody baserowpathlink={currpath} data={apiData} tableHeaders = {tableBodyJSONProps}></TableBody>
                                 <TablePagination numberOfColumns={tableHeaders.length}/>
                             </Table>   
-                        </Grid.Row>
-                        }
-                    </Segment>
+                            }
+                        </Container>
+                    </Grid.Column>
                 </Grid>
-            </Container>
             }
         
         </div>

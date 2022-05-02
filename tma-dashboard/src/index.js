@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
 //import reportWebVitals from './reportWebVitals';
+import 'semantic-ui-less/semantic.less'
 
 ReactDOM.render( 
 <BrowserRouter>

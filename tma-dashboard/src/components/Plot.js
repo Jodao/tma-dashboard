@@ -39,8 +39,8 @@ function Plot(props){
     let dataSetMetric = {
         //"label" and "data" properties missing from input
         type: "line",
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 1)',
+        borderColor: '#007bff',
+        backgroundColor: '#007bff',
         order: 2,
         pointStyle: "circle",
         radius: 7,
@@ -138,7 +138,7 @@ function Plot(props){
                     backgroundColor: "rgba(0, 0, 0, 0.5)",
                     callbacks: {
                         label: plotLabelHandler
-                    }
+                    },
                 }
             },
             scales:{
@@ -164,7 +164,7 @@ function Plot(props){
                     title: {
                         display: true,
                         text: "TimeStamp (dd/MM/yyyy, HH:mm:ss)",
-                        color: '#911',
+                        color: '#0057b3',
                         font: {
                             family: 'Times New Roman',
                             weight: 'bold',
@@ -173,7 +173,8 @@ function Plot(props){
                     ticks: {
                         maxTicksLimit: 20,
                         font: {
-                        }
+                        },
+                        color: "#000000"
                     }
                 },
                 y: {
@@ -181,7 +182,7 @@ function Plot(props){
                     title: {
                         display: true,
                         text: props.plotData.ylabel,
-                        color: '#191',
+                        color: '#0057b3',
                         font: {
                             family: 'Times New Roman',
                             weight: 'bold',
@@ -190,7 +191,8 @@ function Plot(props){
                     ticks: {
                         maxTicksLimit: 21,
                         font: {
-                        }
+                        },
+                        color: "#000000"
                     }
                 } 
             },
@@ -234,7 +236,7 @@ function Plot(props){
             <Loader active inline='centered'> Preparing chart </Loader>
         :    
             <div>
-                <Button 
+                <Button color="grey"
                     floated='right'
                     loading = {chartPDFGen}
                     onClick={ () => {

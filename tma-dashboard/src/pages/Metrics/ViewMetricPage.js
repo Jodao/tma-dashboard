@@ -9,6 +9,26 @@ function ViewMetricPage(){
     const [apiData, setAPIData] = useState(null);
     const metricId = useParams()["id"];
 
+    const leafAggregationOptions = {
+        0: "Average",
+        1: "Minimum",
+        2: "Maximum",
+        3: "Sum"
+    }
+
+    const leafNormalizationKindOptions = {
+        0: "BENEFIT",
+        1: "COST",
+        2: "Maximum",
+        3: "Sum"
+    }
+
+    const metricAggregationOptions = {
+        0: "Neutrality",
+        1: "Simultaneity",
+        2: "Replaceability",
+    }
+
     function makeAPIRequest(){
         ApiModule().getMetricById(metricId, setAPIData)
     }
@@ -20,12 +40,15 @@ function ViewMetricPage(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
     
+    useEffect(()=>{
+        console.log(apiData)
+    },[apiData])
 
     return(
         <div>
             <Grid centered>
             <Grid.Row >
-                <Grid.Column width={12}>
+                <Grid.Column width={15}>
                 <Divider section horizontal>
                     <Header as="h1" textAlign="center"> Metric Details</Header> 
                 </Divider>
@@ -34,107 +57,113 @@ function ViewMetricPage(){
             </Grid>
             <br/>
             {
-                //if apiData is null, then it is because the response from the API hasn't arrived
-                apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
-                <div>
-                    <Container>
-                            <Segment>
-                                <Segment>
-                                    <Header as="h3" textAlign="center"> Metric Information</Header>
-                                    <Divider/>
-                                    <Form widths="equal">
-                                        <Form.Group >
-                                            <Form.Field>
-                                                <label>metricId</label>
-                                                <input type='text' value={apiData["metricId"]} readOnly/>
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>metricName</label>
-                                                <input type='text' value={apiData["metricName"]} readOnly />
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>blockLevel</label>
-                                                <input type='text' value={apiData["blockLevel"]} readOnly />
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>Leaf Attribute ?</label>
-                                                {
-                                                    apiData["leafAttribute"] === null ?
-                                                    <Icon 
-                                                        color='red' 
-                                                        size='big' 
-                                                        name='remove' 
-                                                    />
-                                                    :   
-                                                    <Icon
-                                                        color='green' 
-                                                        size='big'
-                                                        name='checkmark' 
-                                                    />
-                                                }
-                                            </Form.Field>
-                                        </Form.Group>
-                                    </Form>
-                                </Segment>
-                                {apiData["leafAttribute"] === null ?
-                                <Segment >
-                                    <Header as="h3" textAlign="center"> Metrics tree</Header>
-                                    <Divider/>
-                                    <TreeRender width={"100%"} height={"50vh"} data={apiData}/>
-                                </Segment>
-                                :   
-                                <Segment >
-                                    <Header as="h3" textAlign="center"> Leaf Attribute information</Header>
-                                    <Divider/>
-                                    <Form widths="equal">
-                                        <Form.Group>
-                                            <Form.Field>
-                                                <label>Description</label>
-                                                <input 
-                                                type='text' 
-                                                value=
-                                                    {
-                                                        "[id = " + apiData["leafAttribute"]["description"]["descriptionId"] + "] " + 
-                                                        apiData["leafAttribute"]["description"]["descriptionName"] + " (" + 
-                                                        apiData["leafAttribute"]["description"]["unit"] + ")"
-                                                    } 
-                                                readOnly
-                                                />
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>metricAggregationOperator</label>
-                                                <input type='number' value={apiData["leafAttribute"]["metricAggregationOperator"]} readOnly />
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>numSamples</label>
-                                                <input type='number' value={apiData["leafAttribute"]["numSamples"]} readOnly />
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>normalizationMethod</label>
-                                                <input type='text' value={apiData["leafAttribute"]["normalizationMethod"]} readOnly />
-                                            </Form.Field>
-                                        </Form.Group>
-                                        <Form.Group>
-                                            <Form.Field>
-                                                <label>normalizationKind</label>
-                                                <input type='number' value={apiData["leafAttribute"]["normalizationKind"]} readOnly />
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>minimumThreshold</label>
-                                                <input type='number' value={apiData["leafAttribute"]["minimumThreshold"]} readOnly />
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>maximumThreshold</label>
-                                                <input type='number' value={apiData["leafAttribute"]["maximumThreshold"]} readOnly />
-                                            </Form.Field>
-                                        </Form.Group>
-                                    </Form>
-                                </Segment>
-                                }
-                            </Segment>
-                        
-                    </Container>
-            </div>
+            //if apiData is null, then it is because the response from the API hasn't arrived
+            apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
+            <Container>
+                <Grid columns={2}>
+                    <Grid.Column>
+                        <Segment>
+                            <Header as="h3" textAlign="center"> Metric Information</Header>
+                            <Divider/>
+                            <Form widths="equal">
+                                <Form.Group >
+                                    <Form.Field>
+                                        <label>Id:</label>
+                                        {apiData["metricId"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Name:</label>
+                                        {apiData["metricName"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Block Level:</label>
+                                        {apiData["blockLevel"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Leaf Attribute:</label>
+                                        {
+                                            apiData["leafAttribute"] === null ?
+                                            <Icon 
+                                                color='red' 
+                                                size='big' 
+                                                name='remove' 
+                                            />
+                                            :   
+                                            <Icon
+                                                color='green' 
+                                                size='big'
+                                                name='checkmark' 
+                                            />
+                                        }
+                                    </Form.Field>
+                                    {apiData["leafAttribute"] === null ? 
+                                    <Form.Field>
+                                        <label>Attribute Aggregation Operator:</label>
+                                        { metricAggregationOptions[apiData["attributeAggregationOperator"]]}
+                                    </Form.Field>
+                                    :
+                                    null
+                                    }
+                                </Form.Group>
+                            </Form>
+                        </Segment>
+                    </Grid.Column>
+                    {apiData["leafAttribute"] === null ?
+                    <Grid.Column>
+                        <Segment>
+                            <Header as="h3" textAlign="center"> Metrics tree</Header>
+                            <Divider/>
+                            <TreeRender width={"100%"} height={"50vh"} data={apiData}/>
+                        </Segment>
+                    </Grid.Column>
+                    :   
+                    <Grid.Column>
+                        <Segment>
+                            <Header as="h3" textAlign="center"> Leaf Attribute information</Header>
+                            <Divider/>
+                            <Form widths="equal">
+                                <Form.Group>
+                                    <Form.Field>
+                                        <label>Description:</label>
+                                        {
+                                            "[id = " + apiData["leafAttribute"]["description"]["descriptionId"] + "] " + 
+                                            apiData["leafAttribute"]["description"]["descriptionName"] + " (" + 
+                                            apiData["leafAttribute"]["description"]["unit"] + ")"
+                                        }
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Metric Aggregation Operator:</label>
+                                        {leafAggregationOptions[apiData["leafAttribute"]["metricAggregationOperator"]]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Number of Samples:</label>
+                                        {apiData["leafAttribute"]["numSamples"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Normalization Method:</label>
+                                        {apiData["leafAttribute"]["normalizationMethod"]}
+                                    </Form.Field>
+                                </Form.Group>
+                                <Form.Group>
+                                    <Form.Field>
+                                        <label>Normalization Kind:</label>
+                                        {leafNormalizationKindOptions[apiData["leafAttribute"]["normalizationKind"]]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Minimum Threshold:</label>
+                                        {apiData["leafAttribute"]["minimumThreshold"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Maximum Threshold:</label>
+                                        {apiData["leafAttribute"]["maximumThreshold"]}
+                                    </Form.Field>
+                                </Form.Group>
+                            </Form>
+                        </Segment>
+                    </Grid.Column>
+                    }
+                </Grid>
+            </Container>
             }
         
         </div>

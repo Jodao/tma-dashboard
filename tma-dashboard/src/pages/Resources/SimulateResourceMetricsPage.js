@@ -168,7 +168,7 @@ function SimulateResourceMetricsPage(){
         <div>
             <Grid centered>
             <Grid.Row >
-                <Grid.Column width={12}>
+                <Grid.Column width={15}>
                 <Divider section horizontal>
                     <Header as="h1" textAlign="center">Simulate Resource Metrics </Header> 
                 </Divider>

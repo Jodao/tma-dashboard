@@ -274,6 +274,21 @@ function ApiModule() {
       )
   }
 
+  function deletePlotConfig(id){
+    let endpoint = apiURL + "deletePlotConfig/" + id
+    //axios.get() returns a promise, thereby when the response is received it is treated
+    return axios.delete(endpoint).then((res) => 
+        {
+          return res.status
+        }
+      ).catch(function (error) 
+        {
+          console.log('Error:', error.message);
+          return null
+        }
+      )
+  }
+
   return {
     getMetrics,
     getMetricById,
@@ -291,7 +306,8 @@ function ApiModule() {
     getSimulationData,
     getPlotsConfigs,
     savePlotConfig,
-    replacePlotConfig
+    replacePlotConfig,
+    deletePlotConfig
   };
 
 }

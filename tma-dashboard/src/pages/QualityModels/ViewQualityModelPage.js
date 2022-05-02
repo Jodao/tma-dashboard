@@ -8,7 +8,8 @@ import TablePagination from '../../components/tables/TablePagination'
 import TreeRender from '../../utils/treeRendering/TreeRender';
 
 function ViewQualityModelPage(){
-    const tableHeaders = ["configurationProfileId","profileName"]
+    const tableHeaders = ["Id","Name"]
+    const tableBoodyJSONProps = ["configurationProfileId","profileName"]
     
     const [apiData, setAPIData] = useState(null);
     const qualityModelId = useParams()["id"];
@@ -35,7 +36,7 @@ function ViewQualityModelPage(){
         <div>
             <Grid centered>
             <Grid.Row >
-                <Grid.Column width={12}>
+                <Grid.Column width={15}>
                 <Divider section horizontal>
                     <Header as="h1" textAlign="center"> Quality Model Details</Header> 
                 </Divider>
@@ -48,72 +49,75 @@ function ViewQualityModelPage(){
                 apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
                 <div>
                     <Container>
-                            <Segment>
-                                <Form widths="equal">
-                                    <Form.Group>
-                                        <Form.Field>
-                                            <label>qualityModelId</label>
-                                            <input type='number' value={apiData["qualityModelId"]} readOnly/>
-                                        </Form.Field>
-                                        <Form.Field>
-                                            <label>modelName</label>
-                                            <input type='text' value={apiData["modelName"]} readOnly />
-                                        </Form.Field>
-                                        <Form.Field>
-                                            <label>modelDescriptionReference</label>
-                                            <input type='number' value={apiData["modelDescriptionReference"]} readOnly />
-                                        </Form.Field>
-                                        <Form.Field>
-                                            <label>businessThreshold</label>
-                                            <input type='number' value={apiData["businessThreshold"]} readOnly />
-                                        </Form.Field>
-                                    </Form.Group>
-                                    <Form.Group>
-                                        <Form.Field>
-                                            <label>metricId</label>
-                                            <input type='number' value={apiData["metric"]["metricId"]} readOnly/>
-                                        </Form.Field>
-                                        <Form.Field>
-                                            <label>metricName</label>
-                                            <input type='text' value={apiData["metric"]["metricName"]} readOnly/>
-                                        </Form.Field>
-                                    </Form.Group>
-                                </Form>
-                                <Grid columns={2}>
-                                        <Grid.Column>
-                                            <Segment>
-                                                <Grid columns={1}>
-                                                    <Grid.Column>
-                                                        <Header as="h4" textAlign="center"> Configuration Profiles associated</Header>
-                                                        <Button onClick={addProfileButtonHandler} floated='right'>Add Profile</Button>
-                                                        <Table  
-                                                        style = {{marginLeft: "auto"}} 
-                                                        textAlign="center" 
-                                                        compact 
-                                                        collapsing  
-                                                        celled 
-                                                        selectable> 
-                                                            <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
-                                                            <TableBody 
-                                                                rowlinkdata={apiData}
-                                                                baserowpathlink={"/getConfigurationProfile"} 
-                                                                data={apiData["configurationProfiles"]} 
-                                                                tableHeaders = {tableHeaders}
-                                                            />
-                                                            <TablePagination numberOfColumns={tableHeaders.length}/>
-                                                        </Table>   
-                                                    </Grid.Column>
-                                                </Grid>
-                                            </Segment>
-                                        </Grid.Column>
-                                        <Grid.Column>
-                                            <Segment>
-                                                <Header as="h4" textAlign="center"> Metrics tree</Header>
-                                                <TreeRender width={"100%"} height={"50vh"} data={apiData["metric"]}/>
-                                            </Segment>
-                                        </Grid.Column> 
-                                </Grid>
-                            </Segment>
+                        <Segment>
+                            <Form widths="equal">
+                                <Form.Group>
+                                    <Form.Field>
+                                        <label>Id:</label>
+                                        {apiData["qualityModelId"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Name:</label>
+                                        {apiData["modelName"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Description Reference:</label>
+                                        {apiData["modelDescriptionReference"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Business Threshold:</label>
+                                        {apiData["businessThreshold"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Metric Id:</label>
+                                        {apiData["metric"]["metricId"]}
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Metric Name:</label>
+                                        {apiData["metric"]["metricName"]}
+                                    </Form.Field>
+                                </Form.Group>
+                            </Form>
+                        </Segment>
+                        <Grid columns={2}>
+                                <Grid.Column>
+                                    <Segment>
+                                        <Grid columns={1}>
+                                            <Grid.Column>
+                                                <Header as="h4" textAlign="center"> Configuration Profiles associated</Header>
+                                                <Divider/>
+                                                <Button style={{marginBottom: "2vh"}} color='blue' 
+                                                    onClick={addProfileButtonHandler} floated='right'
+                                                >
+                                                    Add Profile
+                                                </Button>
+                                                <Table
+                                                    textAlign="center" 
+                                                    compact   
+                                                    celled 
+                                                    selectable
+                                                > 
+                                                    <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
+                                                    <TableBody 
+                                                        rowlinkdata={apiData}
+                                                        baserowpathlink={"/getConfigurationProfile"} 
+                                                        data={apiData["configurationProfiles"]} 
+                                                        tableHeaders = {tableBoodyJSONProps}
+                                                    />
+                                                    <TablePagination numberOfColumns={tableHeaders.length}/>
+                                                </Table>   
+                                            </Grid.Column>
+                                        </Grid>
+                                    </Segment>
+                                </Grid.Column>
+                                <Grid.Column>
+                                    <Segment>
+                                        <Header as="h4" textAlign="center"> Metrics tree</Header>
+                                        <Divider/>
+                                        <TreeRender width={"100%"} height={"50vh"} data={apiData["metric"]}/>
+                                    </Segment>
+                                </Grid.Column> 
+                        </Grid>
                     </Container>
             </div>
             }

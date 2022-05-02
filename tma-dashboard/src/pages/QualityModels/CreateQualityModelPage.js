@@ -116,7 +116,7 @@ function CreateQualityModelPage(){
         <div>
             <Grid centered>
             <Grid.Row >
-                <Grid.Column width={12}>
+                <Grid.Column width={15}>
                 <Divider section horizontal>
                     <Header as="h1" textAlign="center"> Create Quality Model</Header> 
                 </Divider>
@@ -156,7 +156,7 @@ function CreateQualityModelPage(){
                                                 error={validInput("businessThreshold")}
                                             />
                                         </Form.Field>
-                                        <Form.Button color="blue" circular type='submit' floated="right" onClick={submitHandler}> 
+                                        <Form.Button color="grey" circular type='submit' floated="right" onClick={submitHandler}> 
                                             Create Quality Model
                                         </Form.Button>
                                     </Form.Group>

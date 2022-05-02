@@ -1,4 +1,4 @@
-import { Menu, Segment, Icon, Grid } from 'semantic-ui-react'
+import { Menu, Icon, Image } from 'semantic-ui-react'
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function NavBar() {
@@ -29,8 +29,9 @@ function NavBar() {
   //ICONS THAT MAY BE NICE TO USE -> eye, HEARTBEAT, database, tasks, cogs, stethoscope, user md, band aid/ wrench,
   //dollar,euro, privacy, spy, chart bar outline
     return (
-      <div style={{textAlign: "center" }}>
-        <Menu icon='labeled'  pointing secondary compact>
+      <div style={{textAlign: "center", background: "#a7abae"}}>
+        <Image src="/TMA_InitialLogo.png" size="medium" style={{position: "relative", display: "inline", marginRight: "1vw"}}/>
+        <Menu icon='labeled' pointing secondary compact>
           <Menu.Item name='home' active={ pathname === '/'} onClick={handleItemClick}>
             <Icon name='dashboard' />
             Home

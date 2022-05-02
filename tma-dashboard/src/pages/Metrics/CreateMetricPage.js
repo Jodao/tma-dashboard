@@ -266,7 +266,7 @@ function CreateMetricPage(props){
         <div>
             <Grid centered>
             <Grid.Row >
-                <Grid.Column width={12}>
+                <Grid.Column width={15}>
                 <Divider section horizontal>
                     <Header as="h1" textAlign="center">Create Metric</Header> 
                 </Divider>
@@ -295,7 +295,7 @@ function CreateMetricPage(props){
                                     null
                                 }
                             />
-                            <Form.Button color="blue" circular type='submit' floated="right" onClick={submitHandler}> 
+                            <Form.Button color="grey" circular type='submit' floated="right" onClick={submitHandler}> 
                                 Create Metric
                             </Form.Button>
                         </Form.Group>

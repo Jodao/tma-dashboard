@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Container, Grid, Segment, Divider, Header, Form, Loader, Icon, Label } from 'semantic-ui-react';
+import { Grid, Segment, Divider, Header, Form, Loader, Icon, Label } from 'semantic-ui-react';
 import 'chartjs-adapter-date-fns';
 import ApiModule from '../utils/api/ApiModule';
 import Plot from '../components/Plot';
@@ -8,7 +8,7 @@ import { Buffer } from 'buffer';
 
 function HomePage(){
     const [userPlotsConfigs,setUserPlotsConfigs] = useState(null);
-    
+
     //do this to access last state variable inside setInterval function for performing live plots
     const plotConfigsRef = useRef(userPlotsConfigs);
     plotConfigsRef.current = userPlotsConfigs
@@ -48,14 +48,14 @@ function HomePage(){
     function replaceConfigHandler(ev){
         var fr=new FileReader();
         let index = parseInt(ev.currentTarget.getAttribute("plotindex"))
-        let plotConfigId = userPlotsConfigs[index].plotConfigId
-        fr.addEventListener('load', (event) => {
-            let newPlotConfig = JSON.parse(event.target.result)
-            newPlotConfig.plotConfigId = plotConfigId
 
-            let newUserPlotsConfigs = JSON.parse(JSON.stringify(userPlotsConfigs))
-            newUserPlotsConfigs[index] = newPlotConfig
+        fr.addEventListener('load', (event) => {
+            let newUserPlotsConfigs = [...userPlotsConfigs]
             
+            let newConfigObject = JSON.parse(event.target.result)
+            newUserPlotsConfigs[index].configObject = newConfigObject
+            newUserPlotsConfigs[index].replace = true
+
             setUserPlotsConfigs(newUserPlotsConfigs)
         });
         fr.readAsText(ev.target.files[0])
@@ -75,6 +75,9 @@ function HomePage(){
     async function savePlotConfigHandler(ev,atts){
         if(ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[atts.plotindex].plotConfigName)){
             let configObjectTemp = JSON.parse(JSON.stringify(userPlotsConfigs[atts.plotindex]))
+            let plotConfigTemp = {
+                plotConfigName: configObjectTemp.plotConfigName, 
+            }
 
             let requestBody = {
                 plotConfigName: configObjectTemp.plotConfigName, 
@@ -82,8 +85,6 @@ function HomePage(){
             
             delete configObjectTemp.ready
             delete configObjectTemp.plotConfigName
-
-            console.log(configObjectTemp)
             
             requestBody.configObject = await new Blob(
                 [JSON.stringify(configObjectTemp)],
@@ -91,14 +92,15 @@ function HomePage(){
             ).arrayBuffer();
             
             requestBody.configObject = Array.from(new Uint8Array(requestBody.configObject))
-            console.log(requestBody)
             
             let plotConfigId = await ApiModule().savePlotConfig(requestBody)
-            console.log(plotConfigId)
+
+            plotConfigTemp.configObject = configObjectTemp
+            plotConfigTemp.plotConfigId = plotConfigId
+            
             setUserPlotsConfigs((prevState) => {
                 let newUserPlotsConfigs = JSON.parse(JSON.stringify(prevState))
-                newUserPlotsConfigs[atts.plotindex].plotConfigId = plotConfigId
-                delete newUserPlotsConfigs[atts.plotindex].ready 
+                newUserPlotsConfigs[atts.plotindex] = plotConfigTemp
                 return newUserPlotsConfigs
             })
             handlePlotData(configObjectTemp, atts.plotindex)
@@ -108,31 +110,32 @@ function HomePage(){
     //replace plot config on database by sending the plotConfigId
     async function replacePlotConfigHandler(ev,atts){
         if(ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[atts.plotindex].plotConfigName)){
-            let configObjectTemp = JSON.parse(JSON.stringify(userPlotsConfigs[atts.plotindex]))
+            let plotConfigTemp = JSON.parse(JSON.stringify(userPlotsConfigs[atts.plotindex]))
 
             let requestBody = {
-                plotConfigName: configObjectTemp.plotConfigName, 
-                plotConfigId: configObjectTemp.plotConfigId
+                plotConfigName: plotConfigTemp.plotConfigName, 
+                plotConfigId: plotConfigTemp.plotConfigId
             }
             
-            delete configObjectTemp.ready
-            delete configObjectTemp.plotConfigName
-
-            console.log(configObjectTemp)
+            delete plotConfigTemp.replace
+            delete plotConfigTemp.plotData
             
             requestBody.configObject = await new Blob(
-                [JSON.stringify(configObjectTemp)],
+                [JSON.stringify(plotConfigTemp.configObject)],
                 {type : 'application/json'}
             ).arrayBuffer();
             
             requestBody.configObject = Array.from(new Uint8Array(requestBody.configObject))
-            console.log(requestBody)
             
             let resStatus = await ApiModule().replacePlotConfig(requestBody)
 
             //if res is successful handlePlotData
-            if(resStatus == 200){
-                handlePlotData(configObjectTemp, atts.plotindex)
+            if(resStatus === 200){
+                let newUserPlotsConfigs = JSON.parse(JSON.stringify(userPlotsConfigs))
+                newUserPlotsConfigs[atts.plotindex] = plotConfigTemp
+                //console.log(newUserPlotsConfigs)
+                setUserPlotsConfigs(newUserPlotsConfigs)
+                handlePlotData(plotConfigTemp.configObject, atts.plotindex)
             }
         }
     }
@@ -194,22 +197,57 @@ function HomePage(){
             let newState = JSON.parse(JSON.stringify(prevState)) 
             newState[plotsindex].plotData = newPlotData
             
-            //if live plot was set, perform API data request each second
+            //if live plot was set, perform API data request each second. Pass timerId for updating and clearing purposes
             if(config.livePlot){
-                newState[plotsindex].liveDataAPIRequestFunctionTimer = setInterval(handleLivePlotData,1000,config,plotsindex)
+                let timerId = setInterval( 
+                    () => {
+                        handleLivePlotData(config,plotsindex,timerId)
+                    },1000)
+                newState[plotsindex].liveDataAPIRequestFunctionTimer = timerId
             }
             return newState
         })
         
     }
 
-    async function handleLivePlotData(config,plotsindex){
+    async function handleLivePlotData(config,plotsindex, timerId){
         //get current location to verify if navbar was clicked and thereby stop executing this function in a loop
         let currLocation = window.location.href.split("/")
-        //May have to change this path when more features considering resources are added
-        if(currLocation[currLocation.length-1] !== ""){
-            clearInterval(plotConfigsRef.current[plotsindex].liveDataAPIRequestFunctionTimer);
-            return;
+        try{
+            if(
+                //May have to change this path when more features considering resources are added
+                currLocation[currLocation.length-1] !== "" 
+                || "replace" in plotConfigsRef.current[plotsindex]){
+                clearInterval(plotConfigsRef.current[plotsindex].liveDataAPIRequestFunctionTimer);
+                return;
+            }
+            else if("removed" in plotConfigsRef.current[plotsindex] && plotConfigsRef.current[plotsindex].removed === true){
+                clearInterval(plotConfigsRef.current[plotsindex].liveDataAPIRequestFunctionTimer);
+               
+                setUserPlotsConfigs((prevState) => {
+                    let newState = JSON.parse(JSON.stringify(prevState))
+                    newState.splice(plotsindex,1)
+                    for(let i=plotsindex; i<newState.length; i++){
+                        //update timers from live plots that have greater indexes than this one
+                        if(newState[i].configObject.livePlot){
+                            let timerId = setInterval( 
+                                () => {
+                                    handleLivePlotData(newState[i].configObject,i,timerId)
+                                },1000)
+                            newState[i].configObject.liveDataAPIRequestFunctionTimer = timerId
+                        }
+                    }
+                    return newState
+                })
+    
+                return;
+            }
+        }
+        catch(err){
+            //if there was an error checking the variables, that means a plot with a index lower than the one from this function
+            //was removed. Thereby a new timed function was set and this one needs to be cleared
+            clearInterval(timerId);
+            return
         }
         
         let queryParams = {
@@ -249,6 +287,43 @@ function HomePage(){
         })
     }
 
+    async function removePlotConfigHandler(ev, atts){
+        setUserPlotsConfigs((prevState) => {
+            let newState = JSON.parse(JSON.stringify(prevState))
+            newState[atts.plotindex].removed = false;
+            return newState
+        })
+
+        let resStatus = await ApiModule().deletePlotConfig(userPlotsConfigs[atts.plotindex].plotConfigId)
+
+        //if res is successful update 
+        if(resStatus === 200){
+            if(userPlotsConfigs[atts.plotindex].configObject.livePlot === false){
+                setUserPlotsConfigs((prevState) => {
+                    let newState = JSON.parse(JSON.stringify(prevState))
+                    newState.splice(atts.plotindex,1)
+                    for(let i=atts.plotindex; i<newState.length; i++){
+                        if(newState[i].configObject.livePlot){
+                            let timerId = setInterval( 
+                                () => {
+                                    handleLivePlotData(newState[i].configObject,i,timerId)
+                                },1000)
+                            newState[i].configObject.liveDataAPIRequestFunctionTimer = timerId
+                        }
+                    }
+                    return newState
+                })
+            }
+            else{
+                setUserPlotsConfigs((prevState) => {
+                    let newState = JSON.parse(JSON.stringify(prevState))
+                    newState[atts.plotindex].removed = true;
+                    return newState
+                })
+            }
+        }
+    }
+
     function generatePlots(row, plotIndex){
         let columnsToReturn = [];
         for(let i = 0; i<2 && plotIndex <= userPlotsConfigs.length; i++){
@@ -257,22 +332,24 @@ function HomePage(){
                     <Segment>
                     {plotIndex < userPlotsConfigs.length ?
                         <div>
-                        {"plotData" in userPlotsConfigs[plotIndex] ?
-                            <React.Fragment>
-                                <Header as="h3" textAlign="center"> 
-                                    {userPlotsConfigs[plotIndex].plotConfigName}
-                                </Header>
-                                <Divider/>
-                                <Plot plotData = {userPlotsConfigs[plotIndex].plotData}/>
-                                <Divider/>
-                                <Label  style={{cursor: "pointer",float: "right"}} as="label" size="large">
-                                    <input type="file" style={{display: "none"}} 
-                                        plotindex={plotIndex} onChange={replaceConfigHandler}
+                        {"replace" in userPlotsConfigs[plotIndex] ?
+                            <Form>
+                                <Form.Group>
+                                    <Form.Input label="Insert new plot configuration name:"
+                                    onChange={onPlotConfigNameChangeHandler}
+                                    plotindex={plotIndex}
+                                    error={
+                                    !ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[plotIndex].plotConfigName) ?
+                                        { content: 'Please insert a name for the plot configuration', pointing: 'above' } 
+                                    : 
+                                        null
+                                    }
                                     />
-                                    Replace Configuration
-                                </Label>
-                                <br/>
-                            </React.Fragment>
+                                    <Form.Button plotindex={plotIndex} onClick={replacePlotConfigHandler}>
+                                        Replace
+                                    </Form.Button>
+                                </Form.Group>
+                            </Form>
                         :
                         "ready" in userPlotsConfigs[plotIndex] ?
                             <Form>
@@ -293,24 +370,53 @@ function HomePage(){
                                 </Form.Group>
                             </Form>
                         :
-                        "plotConfigId" in userPlotsConfigs[plotIndex] ?
-                            <Form>
-                                <Form.Group>
-                                    <Form.Input label="Insert new plot configuration name:"
-                                    onChange={onPlotConfigNameChangeHandler}
-                                    plotindex={plotIndex}
-                                    error={
-                                    !ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[plotIndex].plotConfigName) ?
-                                        { content: 'Please insert a name for the plot configuration', pointing: 'above' } 
-                                    : 
-                                        null
+                        "plotData" in userPlotsConfigs[plotIndex] ?
+                            <React.Fragment>
+                                {"removed" in userPlotsConfigs[plotIndex] ?
+                                <Icon
+                                    style={
+                                        {
+                                            position: "absolute", 
+                                            top: "-23px", right: "-29px",  
+                                            fontSize: "3rem",
+                                            background: "white"
+                                        }
                                     }
+                                    loading
+                                    name='circle notch' color='red'
+                                />
+                                :
+                                <Icon 
+                                    plotindex={plotIndex}
+                                    style={
+                                        {
+                                            position: "absolute", 
+                                            top: "-12px", right: "-21px", 
+                                            background: "white", 
+                                            fontSize: "3rem",
+                                            cursor: "pointer",
+                                            height: "0.5em",
+                                            width: "0.9em"
+                                        }
+                                    }
+                                    name='remove circle' color='red'
+                                    onClick={removePlotConfigHandler}
+                                />
+                                }
+                                <Header as="h3" textAlign="center"> 
+                                    {userPlotsConfigs[plotIndex].plotConfigName}
+                                </Header>
+                                <Divider/>
+                                <Plot plotData = {userPlotsConfigs[plotIndex].plotData}/>
+                                <Divider/>
+                                <Label color='blue'  style={{cursor: "pointer",float: "right"}} as="label" size="large">
+                                    <input type="file" style={{display: "none"}} 
+                                        plotindex={plotIndex} onChange={replaceConfigHandler}
                                     />
-                                    <Form.Button plotindex={plotIndex} onClick={replacePlotConfigHandler}>
-                                        Replace
-                                    </Form.Button>
-                                </Form.Group>
-                            </Form>
+                                    Replace Configuration
+                                </Label>
+                                <br/>
+                            </React.Fragment>
                         :
                             <Loader active inline='centered'> Retrieving plot data... </Loader>
                         }
@@ -349,8 +455,8 @@ function HomePage(){
         <div>
             <Grid centered>
                 <Grid.Row >
-                    <Grid.Column width={12}>
-                        <Divider section horizontal>
+                    <Grid.Column width={15}>
+                        <Divider  section horizontal>
                             <Header as="h1" textAlign="center"> Imported Favourite Plots</Header> 
                         </Divider>
                     </Grid.Column>
@@ -360,11 +466,10 @@ function HomePage(){
             { userPlotsConfigs === null ?
                 <Loader active inline='centered'> Retrieving plots configurations... </Loader>
             :
-            <Container>
+            
                 <Grid padded columns={2}>
                     {generateRows()}
                 </Grid>
-            </Container>
             }
         </div>
     )

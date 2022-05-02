@@ -193,71 +193,84 @@ function CreateConfigurationProfilePage(){
     return(
         <div>
             <Grid centered>
-            <Grid.Row >
-                <Grid.Column width={12}>
-                <Divider section horizontal>
-                    <Header as="h1" textAlign="center">Create Configuration Profile </Header> 
-                </Divider>
-                </Grid.Column>
-            </Grid.Row>
+                <Grid.Row >
+                    <Grid.Column width={15}>
+                        <Divider section horizontal>
+                            <Header as="h1" textAlign="center">Create Configuration Profile </Header> 
+                        </Divider>
+                    </Grid.Column>
+                </Grid.Row>
             </Grid>
             <Container >
-                <Segment>
-                    <Grid columns={2}>
-                        <Grid.Column>
-                            <Segment >
-                                <Header as="h3" textAlign="center"> Quality Model information</Header>
-                                <Form>
-                                    <Form.Group >
-                                        <Form.Field>
-                                            <label>qualityModelId</label>
-                                            <input type='number' value={qm["qualityModelId"]} readOnly/>
-                                        </Form.Field>
-                                        <Form.Field>
-                                            <label>modelName</label>
-                                            <input type='text' value={qm["modelName"]} readOnly />
-                                        </Form.Field>
-                                    </Form.Group>
-                                </Form>
-                            </Segment>
-                            <Segment>
-                                <Header as="h3" textAlign="center"> Weighted metrics tree</Header>
-                                <TreeRender ref={metricsTreeRef} width={"100%"} height={"50vh"} data={qm["metric"]}/>
-                            </Segment>
-                        </Grid.Column>
-                        <Grid.Column> 
+                <Grid columns={2}>
+                    <Grid.Column>
+                        <Segment >
+                            <Header as="h3" textAlign="center"> Quality Model information</Header>
+                            <Divider/>
                             <Form>
-                            <Segment>
-                                <Header as="h3" textAlign="center"> Configuration Profile information</Header>
-                                    <Form.Group grouped>
-                                        <Form.Input width={8} fluid required label='profileName' name="profileName"
-                                        onChange={formFieldInputChangeHandler}
-                                        error={validInput("profileName",null)} 
-                                        />
-                                        <Divider section horizontal>
-                                            <Header as="h5" textAlign="center">Set metrics weigths and thresholds</Header>     
-                                        </Divider>
-                                        {preferences !== null ?
-                                            <Table  
-                                            style = {{marginLeft: "auto", marginRight: "auto"}} 
-                                            textAlign="center" 
-                                            compact 
-                                            collapsing  
-                                            celled 
-                                            selectable> 
+                                <Form.Group >
+                                    <Form.Field>
+                                        <label>qualityModelId</label>
+                                        <input type='number' value={qm["qualityModelId"]} readOnly/>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>modelName</label>
+                                        <input type='text' value={qm["modelName"]} readOnly />
+                                    </Form.Field>
+                                </Form.Group>
+                            </Form>
+                        </Segment>
+                        <Segment>
+                            <Header as="h3" textAlign="center"> Weighted metrics tree</Header>
+                            <Divider/>
+                            <TreeRender ref={metricsTreeRef} width={"100%"} height={"50vh"} data={qm["metric"]}/>
+                        </Segment>
+                    </Grid.Column>
+                    <Grid.Column> 
+                        <Segment compact >
+                            <Header as="h3" textAlign="center"> Configuration Profile</Header>
+                            <Divider/>
+                            <Form>
+                                <Form.Group grouped>
+                                    <Form.Group>
+                                        <Grid columns={2}>
+                                            <Grid.Column> 
+                                                <Form.Input  required label='profileName' name="profileName"
+                                                    onChange={formFieldInputChangeHandler}
+                                                    error={validInput("profileName",null)} 
+                                                />
+                                            </Grid.Column>
+                                            <Grid.Column> 
+                                                <Form.Button
+                                                color= "grey" circular type='submit' floated="right" onClick={submitHandler}> 
+                                                    Create Profile
+                                                </Form.Button> 
+                                            </Grid.Column>
+                                        </Grid>
+                                    </Form.Group>
+                                    <Divider section horizontal>
+                                        <Header as="h5" textAlign="center">Set metrics weigths and thresholds</Header>     
+                                    </Divider>
+                                    {preferences !== null ?
+                                        <Grid columns={1}>
+                                            <Grid.Column>
+                                            <Table textAlign="center" 
+                                                compact   
+                                                celled 
+                                                selectable
+                                                unstackable
+                                            > 
                                                 <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
                                                 {generateCustomTableBody()}
-                                            </Table>   
-                                        :null}
-                                    </Form.Group>
-                            </Segment> 
-                            <Form.Button color= "blue" circular type='submit' floated="right" onClick={submitHandler}> 
-                                Create Profile
-                            </Form.Button> 
+                                            </Table> 
+                                        </Grid.Column>
+                                        </Grid>  
+                                    :null}
+                                </Form.Group>
                             </Form>
-                        </Grid.Column>          
-                    </Grid>
-                </Segment>
+                        </Segment> 
+                    </Grid.Column>          
+                </Grid>
                 <Modal centered={false} closeIcon open={postResponseMessage["openModal"]} onClose={modalCloseHandler}>
                     <Modal.Header>Message</Modal.Header>
                     <Modal.Content>
