@@ -11,6 +11,9 @@ import CreateQualityModelPage from "./pages/QualityModels/CreateQualityModelPage
 import ViewConfigurationProfilePage from "./pages/ConfigurationProfiles/ViewConfigurationProfilePage";
 import PlotResourceMetricsPage from "./pages/Resources/PlotResourceMetricsPage";
 import SimulateResourceMetricsPage from "./pages/Resources/SimulateResourceMetricsPage";
+import ListRulesPage from "./pages/AdaptationRules/ListRulesPage";
+import CreateRulePage from "./pages/AdaptationRules/CreateRulePage";
+import ViewRulePage from "./pages/AdaptationRules/ViewRulePage";
 
 function App() {
   return (
@@ -44,6 +47,10 @@ function App() {
 
         <Route path="/getResources" element={<PlotResourceMetricsPage />}></Route>
         <Route path="/simulateMetrics" element={<SimulateResourceMetricsPage />}></Route>
+
+        <Route path="/getAdaptationRules" element={<ListRulesPage currpath="/getAdaptationRules"/>}></Route>
+        <Route path="/getAdaptationRules/:ruleName" element={<ViewRulePage/>}></Route>
+        <Route path="/createAdaptationRule" element={<CreateRulePage/>}></Route>
 
       </Routes>
     </div>

@@ -14,7 +14,8 @@ function ListMetricsPage(props){
     const tableBodyJSONProps = ["metricId","metricName","blockLevel"] 
     
     const [apiData, setAPIData] = useState(null);
-    const refMetricFilter = useRef();
+
+    const [metricFilter, setMetricFilter] = useState("");
 
     async function makeAPIRequest(queryParams){
         let res = await ApiModule().getMetrics(queryParams)
@@ -27,8 +28,12 @@ function ListMetricsPage(props){
         makeAPIRequest(null)
     },[]);
     
-    function filterHandler(){
-        let queryParams = {"filter": refMetricFilter.current.value}
+    function filterChangeHandler(ev,atts){
+        setMetricFilter(atts["value"])
+    }
+
+    function filterButtonHandler(){
+        let queryParams = {"filter": metricFilter}
         makeAPIRequest(queryParams)
     }
     
@@ -47,7 +52,6 @@ function ListMetricsPage(props){
                 </Grid.Column>
             </Grid.Row>
             </Grid>
-            <br/>
             {
                 //if apiData is null, then it is because the response from the API hasn't arrived
                 apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
@@ -55,16 +59,18 @@ function ListMetricsPage(props){
                 <Grid columns={1}> 
                     <Grid.Column>
                         <Container>
-                            <Form>
-                                <Form.Group inline>
-                                    <Form.Field width='6'> 
-                                        <input ref={refMetricFilter} placeholder='Filter by name or Id' />
+                            <p align="right">
+                                <Button color='blue' onClick={createMetricButtonHandler}> Create Metric </Button>
+                            </p>
+                            <Form widths='equal'>
+                                <Form.Group>
+                                    <Form.Input name="metricFilter" onChange={filterChangeHandler} label="Filter by name or Id"/>
+                                    <Form.Field style={{marginTop: "auto"}}>
+                                        <Form.Button color='blue' type='submit' icon onClick={filterButtonHandler}>
+                                            Filter
+                                            <Icon name='filter' />
+                                        </Form.Button>
                                     </Form.Field>
-                                    <Button color='blue' type='submit' icon onClick={filterHandler}>
-                                        Filter
-                                        <Icon name='filter' />
-                                    </Button>
-                                    <Button style={{marginLeft: "auto"}} floated='right' color='blue' onClick={createMetricButtonHandler}> Create Metric </Button>
                                 </Form.Group>
                             </Form>
                             <Table textAlign="center" compact celled selectable> 

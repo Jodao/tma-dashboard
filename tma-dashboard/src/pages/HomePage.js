@@ -5,22 +5,30 @@ import ApiModule from '../utils/api/ApiModule';
 import Plot from '../components/Plot';
 import ValidInputs from '../utils/ValidInputs';
 import { Buffer } from 'buffer';
+import CustomModal from '../components/CustomModal';
 
 function HomePage(){
     const [userPlotsConfigs,setUserPlotsConfigs] = useState(null);
-
+    const [userPlotsConfigsread,setUserPlotsConfigsread] = useState(false);
+    
     //do this to access last state variable inside setInterval function for performing live plots
     const plotConfigsRef = useRef(userPlotsConfigs);
     plotConfigsRef.current = userPlotsConfigs
     
+    //used to disable the appearence of errors when a 1st submission of the form hasn't been done
+    const [formErrorDisplay, setFormErrorDisplay] = useState(false);
+
+    //variable used for the modal
+    const [postResponseMessage, setPostResponseMessage] = useState({"openModal": false})
+
     useEffect(() => {
         async function makeAPIRequest(){
             let plotsConfigs = await ApiModule().getPlotsConfigs();
             for(let config of plotsConfigs){
                 config.configObject = JSON.parse(Buffer.from(config.configObject,'base64'))
-                console.log(config)
             }
             setUserPlotsConfigs(plotsConfigs)
+            setUserPlotsConfigsread(true)
             for(let i=0; i< plotsConfigs.length; i++){
                 handlePlotData(plotsConfigs[i].configObject,i)
             }
@@ -93,17 +101,27 @@ function HomePage(){
             
             requestBody.configObject = Array.from(new Uint8Array(requestBody.configObject))
             
-            let plotConfigId = await ApiModule().savePlotConfig(requestBody)
+            let res = await ApiModule().savePlotConfig(requestBody)
 
-            plotConfigTemp.configObject = configObjectTemp
-            plotConfigTemp.plotConfigId = plotConfigId
-            
-            setUserPlotsConfigs((prevState) => {
-                let newUserPlotsConfigs = JSON.parse(JSON.stringify(prevState))
-                newUserPlotsConfigs[atts.plotindex] = plotConfigTemp
-                return newUserPlotsConfigs
-            })
-            handlePlotData(configObjectTemp, atts.plotindex)
+            if(res.status === 200){
+                plotConfigTemp.configObject = configObjectTemp
+                plotConfigTemp.plotConfigId = res.data.plotConfigId
+                
+                setUserPlotsConfigs((prevState) => {
+                    let newUserPlotsConfigs = JSON.parse(JSON.stringify(prevState))
+                    newUserPlotsConfigs[atts.plotindex] = plotConfigTemp
+                    return newUserPlotsConfigs
+                })
+                handlePlotData(configObjectTemp, atts.plotindex)
+            }
+            else{
+                res.data["openModal"] = true
+                setPostResponseMessage(res.data)
+            }
+            setFormErrorDisplay(false)
+        }
+        else{
+            setFormErrorDisplay(true)
         }
     }
 
@@ -127,16 +145,24 @@ function HomePage(){
             
             requestBody.configObject = Array.from(new Uint8Array(requestBody.configObject))
             
-            let resStatus = await ApiModule().replacePlotConfig(requestBody)
+            let res = await ApiModule().replacePlotConfig(requestBody)
 
             //if res is successful handlePlotData
-            if(resStatus === 200){
+            if(res.status === 200){
                 let newUserPlotsConfigs = JSON.parse(JSON.stringify(userPlotsConfigs))
                 newUserPlotsConfigs[atts.plotindex] = plotConfigTemp
-                //console.log(newUserPlotsConfigs)
+                
                 setUserPlotsConfigs(newUserPlotsConfigs)
                 handlePlotData(plotConfigTemp.configObject, atts.plotindex)
             }
+            else{
+                res.data["openModal"] = true
+                setPostResponseMessage(res.data)
+            }
+            setFormErrorDisplay(false)
+        }
+        else{
+            setFormErrorDisplay(true)
         }
     }
 
@@ -156,6 +182,9 @@ function HomePage(){
             let currDate = new Date();
             //subtract 60000 to value of currDate to get the timestamp 1 minute ago
             let currDateMinus1Minute = new Date(currDate.getTime() - 60000)
+            
+            config.startDate = currDateMinus1Minute
+            config.endDate = currDate
 
             queryParams.startDate = parseInt(currDateMinus1Minute.valueOf() / 1000)
             queryParams.endDate = parseInt(currDate.valueOf() / 1000)
@@ -196,7 +225,8 @@ function HomePage(){
         setUserPlotsConfigs( (prevState) => {
             let newState = JSON.parse(JSON.stringify(prevState)) 
             newState[plotsindex].plotData = newPlotData
-            
+            newState[plotsindex].configObject.startDate = config.startDate
+            newState[plotsindex].configObject.endDate = config.endDate
             //if live plot was set, perform API data request each second. Pass timerId for updating and clearing purposes
             if(config.livePlot){
                 let timerId = setInterval( 
@@ -283,6 +313,9 @@ function HomePage(){
             if(config.addPlansInfo){
                 config.plansData = res[0].listOfPlansInfo
             }
+
+            newState[plotsindex].configObject.startDate = currDateMinus1Minute
+            newState[plotsindex].configObject.endDate = currDate
             return newState
         })
     }
@@ -339,7 +372,7 @@ function HomePage(){
                                     onChange={onPlotConfigNameChangeHandler}
                                     plotindex={plotIndex}
                                     error={
-                                    !ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[plotIndex].plotConfigName) ?
+                                    formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[plotIndex].plotConfigName) ?
                                         { content: 'Please insert a name for the plot configuration', pointing: 'above' } 
                                     : 
                                         null
@@ -358,20 +391,23 @@ function HomePage(){
                                     onChange={onPlotConfigNameChangeHandler}
                                     plotindex={plotIndex}
                                     error={
-                                    !ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[plotIndex].plotConfigName) ?
+                                    formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(userPlotsConfigs[plotIndex].plotConfigName) ?
                                         { content: 'Please insert a name for the plot configuration', pointing: 'above' } 
                                     : 
                                         null
                                     }
                                     />
-                                    <Form.Button plotindex={plotIndex} onClick={savePlotConfigHandler}>
+                                </Form.Group>
+                                <div align="right">
+                                    <Form.Button icon color='grey' plotindex={plotIndex} onClick={savePlotConfigHandler}>
+                                        <Icon name='save outline'/>
                                         Save
                                     </Form.Button>
-                                </Form.Group>
+                                </div>
                             </Form>
                         :
                         "plotData" in userPlotsConfigs[plotIndex] ?
-                            <React.Fragment>
+                            <div>
                                 {"removed" in userPlotsConfigs[plotIndex] ?
                                 <Icon
                                     style={
@@ -407,23 +443,45 @@ function HomePage(){
                                     {userPlotsConfigs[plotIndex].plotConfigName}
                                 </Header>
                                 <Divider/>
-                                <Plot plotData = {userPlotsConfigs[plotIndex].plotData}/>
+                                    <Plot 
+                                        plotPath=""
+                                        plotData = {userPlotsConfigs[plotIndex].plotData}
+                                        startDate={
+                                            typeof(userPlotsConfigs[plotIndex].configObject.startDate) === "object" ?
+                                                userPlotsConfigs[plotIndex].configObject.startDate
+                                            :
+                                            typeof(userPlotsConfigs[plotIndex].configObject.startDate) === "string" ?
+                                                new Date(userPlotsConfigs[plotIndex].configObject.startDate)
+                                            :
+                                                new Date(userPlotsConfigs[plotIndex].configObject.startDate * 1000)
+                                        } 
+                                        endDate={
+                                            typeof(userPlotsConfigs[plotIndex].configObject.endDate) === "object" ?
+                                                userPlotsConfigs[plotIndex].configObject.endDate
+                                            :
+                                            typeof(userPlotsConfigs[plotIndex].configObject.endDate) === "string" ?
+                                                new Date(userPlotsConfigs[plotIndex].configObject.endDate)
+                                            :
+                                                new Date(userPlotsConfigs[plotIndex].configObject.endDate * 1000)
+                                        } 
+                                    />
                                 <Divider/>
-                                <Label color='blue'  style={{cursor: "pointer",float: "right"}} as="label" size="large">
+                                <Label color='blue'  style={{cursor: "pointer",float: "right", marginTop: "-5px"}} as="label" size="large">
+                                    <Icon name='exchange' />
                                     <input type="file" style={{display: "none"}} 
                                         plotindex={plotIndex} onChange={replaceConfigHandler}
                                     />
                                     Replace Configuration
                                 </Label>
                                 <br/>
-                            </React.Fragment>
+                            </div>
                         :
                             <Loader active inline='centered'> Retrieving plot data... </Loader>
                         }
                         </div>
                         :
-                        <Label style={{cursor: "pointer"}} as="label" size="big">
-                                <Icon name='plus square outline' />
+                        <Label color='blue' style={{cursor: "pointer"}} as="label" size="big">
+                                <Icon name='add' />
                                 <input type="file" style={{display: "none"}} onChange={readPlotConfigHandler}></input>
                                 Plot Configuration
                         </Label>
@@ -463,14 +521,18 @@ function HomePage(){
                 </Grid.Row>
             </Grid>
             <br/>
-            { userPlotsConfigs === null ?
+            { !userPlotsConfigsread ?
                 <Loader active inline='centered'> Retrieving plots configurations... </Loader>
             :
             
-                <Grid padded columns={2}>
+                <Grid stackable padded columns={2}>
                     {generateRows()}
                 </Grid>
             }
+            <CustomModal 
+                successPath="/" 
+                modalInfo={postResponseMessage} 
+            />
         </div>
     )
 }

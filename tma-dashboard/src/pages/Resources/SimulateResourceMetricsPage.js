@@ -6,13 +6,20 @@ import TreeRender from '../../utils/treeRendering/TreeRender';
 import TableHeader from "../../components/tables/TableHeader"
 import ValidInputs from '../../utils/ValidInputs';
 import Plot from '../../components/Plot';
+import CustomModal from '../../components/CustomModal';
 
 function SimulateResourceMetricsPage(){
     const tableHeaders = [
         "metricName", 
         <p>Original weight</p>,
-        <p>Simulation weight<font color='red'>*</font></p>
+        <p>Simulation weight<font color='#990000'>*</font></p>
     ]
+
+    //used to disable the appearence of errors when a 1st submission of the form hasn't been done
+    const [formErrorDisplay, setFormErrorDisplay] = useState(false);
+
+    //holds message from API response to request and any other messages to be presented to the user
+    const [serverResponseMessage, setServerResponseMessage] = useState({"openModal": false})
 
     //reads data from previous page
     const data = useLocation()["state"]
@@ -94,7 +101,7 @@ function SimulateResourceMetricsPage(){
         return(
             <Table.Row key={uniqueId++}>
                 <Table.Cell key={uniqueId++}>
-                    <Label color='grey'> {metric["metricName"]} </Label>
+                    {metric["metricName"]}
                 </Table.Cell>
                 <Table.Cell key={uniqueId++}>
                     {originalPreferences.find(item => item.metricId === metric.metricId).weight}
@@ -104,7 +111,7 @@ function SimulateResourceMetricsPage(){
                     onChange={weightInputChangeHandler} required 
                     defaultValue={simulationPreferences[metric.metricId]}
                     error={
-                        !ValidInputs().validFloatBetweenZeroAndOne(simulationPreferences[metric.metricId]) ?
+                        formErrorDisplay && !ValidInputs().validFloatBetweenZeroAndOne(simulationPreferences[metric.metricId]) ?
                         { content: 'Please enter a float number where  0.0 <= number <= 1.0', pointing: 'above' }
                         :
                         null
@@ -122,6 +129,26 @@ function SimulateResourceMetricsPage(){
         metricsTreeRef.current.updateWeightsHandler(atts["metricid"], atts["value"])
     }
     
+    //used to validate that childs of a parent metric have a sum of weights = 1
+    function validWeightsSum(parentMetric){
+        //reached a leaf metric
+        if(parentMetric.childMetrics.length === 0){
+            return true
+        }
+        else{
+            let sum = 0
+            for(let child of parentMetric.childMetrics){
+                if(!validWeightsSum(child))
+                    return false
+                sum += parseFloat(simulationPreferences[child.metricId])
+            }
+            if(sum !== 1){
+                return false
+            }
+            return true
+        }
+    }
+
     async function submitHandler(ev){
         ev.preventDefault()
         let valid = true
@@ -134,6 +161,20 @@ function SimulateResourceMetricsPage(){
         }
 
         if(valid){
+            setFormErrorDisplay(false)
+
+            //then it is not valid and customize message
+            if(!validWeightsSum(data.metricToSimulate)){
+                setServerResponseMessage(
+                    {
+                        messageType: "error",
+                        message: "Sibling metrics must have the sum of their weights equal to 1. Please, rectify the weights.",
+                        openModal: true
+                    }
+                )
+                return
+            }
+
             setLoadingSimulationData(true)
             
             //process data into a format acceptable by the API
@@ -162,6 +203,9 @@ function SimulateResourceMetricsPage(){
             
             setLoadingSimulationData(false);
         }
+        else{
+            setFormErrorDisplay(true)
+        }
     }
 
     return(
@@ -180,13 +224,13 @@ function SimulateResourceMetricsPage(){
             :
                 <Container >
                     <Segment>
-                        <Label ribbon as='b' color="blue">
+                        <Label ribbon as='b' color="grey">
                             <Header as="h3"> Note: </Header> 
                             Scroll down to visualize the Plot area.
                         </Label>
                         <br/>
                         <br/>
-                        <Grid columns={2}>
+                        <Grid stackable columns={2}>
                             <Grid.Column>
                                 <Segment >
                                     <Header as="h3" textAlign="center"> Simulation Information</Header>
@@ -259,12 +303,33 @@ function SimulateResourceMetricsPage(){
                         {loadingSimulationData ?
                             <Loader active inline='centered'> Performing simulation... Please Wait  </Loader>
                         :
-                            <Plot plotData={plotData}></Plot>
+                            null 
                         }
+                        <div style={{display: loadingSimulationData? "none":"block"}}>
+                            <Plot 
+                                plotPath="simulateMetrics" plotData={plotData}
+                                startDate={
+                                    typeof(data.startDate) === "object" ?
+                                        data.startDate
+                                    :
+                                        new Date(data.startDate * 1000)
+                                } 
+                                endDate={
+                                    typeof(data.endDate) === "object" ?
+                                        data.endDate
+                                    :
+                                        new Date(data.endDate * 1000)
+                                } 
+                            />
+                        </div>
                         </Segment>
                     </Segment>
                 </Container>
             }
+            <CustomModal 
+                successPath={"simulateMetrics"}
+                modalInfo={serverResponseMessage} 
+            />
         </div>
     )
 }

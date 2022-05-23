@@ -1,10 +1,10 @@
-import { Loader, Divider, Container, Header, Grid, Segment, Form, Label, Button, Message, Modal} from 'semantic-ui-react'
+import { Loader, Divider, Container, Header, Grid, Segment, Form, Label} from 'semantic-ui-react'
 import ApiModule from "../../utils/api/ApiModule"
 import {useState, useEffect} from "react"
-import { useNavigate} from "react-router-dom"
 import DropDownDataFormat from '../../utils/dropDownDataFormat/DropDownDataFormat'
 import TreeRender from '../../utils/treeRendering/TreeRender';
 import ValidInputs from '../../utils/ValidInputs'
+import CustomModal from '../../components/CustomModal';
 
 function CreateQualityModelPage(){
     const [metrics, setMetrics] = useState(null);
@@ -13,8 +13,7 @@ function CreateQualityModelPage(){
 
     const [postResponseMessage, setPostResponseMessage] = useState({"openModal": false})
 
-    let navigate = useNavigate();
-
+    const [formErrorDisplay, setFormErrorDisplay] = useState(false);
 
     async function makeAPIRequestMetrics(queryParams){
         let res = await ApiModule().getMetrics(queryParams);
@@ -44,24 +43,26 @@ function CreateQualityModelPage(){
     }
 
     function validInput(formInputName){
-        if (formInputName === "modelName"){
-            if(!ValidInputs().validStringOrDropDownSelection(formData["modelName"])){
-                return { content: 'Please enter a name for the Quality Model', pointing: 'above' }
+        if(formErrorDisplay){
+            if (formInputName === "modelName"){
+                if(!ValidInputs().validStringOrDropDownSelection(formData["modelName"])){
+                    return { content: 'Please enter a name for the Quality Model', pointing: 'above' }
+                }
             }
-        }
-        else if (formInputName === "modelDescriptionReference"){
-            if(!ValidInputs().validIntGreaterOrEqualThanZero(formData["modelDescriptionReference"])){
-                return { content: 'Please enter an integer number >= 0', pointing: 'above' }
+            else if (formInputName === "modelDescriptionReference"){
+                if(!ValidInputs().validIntGreaterOrEqualThanZero(formData["modelDescriptionReference"])){
+                    return { content: 'Please enter an integer number >= 0', pointing: 'above' }
+                }
             }
-        }
-        else if (formInputName === "businessThreshold"){
-            if(!ValidInputs().validFloatBetweenZeroAndOne(formData["businessThreshold"])){
-                return { content: 'Please enter a float number where  0.0 <= number <= 1.0 ', pointing: 'above' }
+            else if (formInputName === "businessThreshold"){
+                if(!ValidInputs().validFloatBetweenZeroAndOne(formData["businessThreshold"])){
+                    return { content: 'Please enter a float number where  0.0 <= number <= 1.0 ', pointing: 'above' }
+                }
             }
-        }
-        else if (formInputName === "metricId"){
-            if(!ValidInputs().validStringOrDropDownSelection(formData["metricId"])){
-                return { content: 'Please choose a metric', pointing: 'above' }
+            else if (formInputName === "metricId"){
+                if(!ValidInputs().validStringOrDropDownSelection(formData["metricId"])){
+                    return { content: 'Please choose a metric', pointing: 'above' }
+                }
             }
         }
         return null;
@@ -98,18 +99,8 @@ function CreateQualityModelPage(){
                 openModal: true
             }
         )
-    }
 
-    function modalCloseHandler(ev,atts){
-        if(postResponseMessage.messageType === "success"){
-            navigate("/getQualityModels")
-        }
-        setPostResponseMessage(
-            {
-                ...postResponseMessage,
-                openModal: false
-            }
-        )
+        setFormErrorDisplay(true)
     }
     
     return(
@@ -190,27 +181,10 @@ function CreateQualityModelPage(){
                                 }
                             </Segment>
                     </Container>
-                    <Modal centered={false} closeIcon open={postResponseMessage["openModal"]} onClose={modalCloseHandler}>
-                        <Modal.Header>Message</Modal.Header>
-                        <Modal.Content>
-                            <Message 
-                            color= {
-                                    postResponseMessage["messageType"] === "success" ? 
-                                    "green"
-                                    :postResponseMessage["messageType"] === "warning" ?
-                                    "orange"
-                                    : "red" 
-                                }
-                            >
-                                <Message.Header>{postResponseMessage["message"]}</Message.Header>
-                            </Message>
-                        </Modal.Content>
-                        <Modal.Actions>
-                            <Button color='grey' onClick={modalCloseHandler}>
-                                Close
-                            </Button>
-                        </Modal.Actions>
-                    </Modal>
+                    <CustomModal 
+                        successPath="/getQualityModels" 
+                        modalInfo={postResponseMessage} 
+                    />
                 </div>
             }
         

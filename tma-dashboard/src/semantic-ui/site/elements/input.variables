@@ -1,9 +1,3 @@
 /*******************************
     User Variable Overrides
 *******************************/
-@import "../globals/site.variables";
-
-/*@border: 1px solid @red;
-*/
-@placeholderColor: @red;
-@placeholderFocusColor: @red;

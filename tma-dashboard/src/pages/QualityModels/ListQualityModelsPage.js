@@ -83,43 +83,41 @@ function ListQualityModelsPage(props){
     return(
         <div>
             <Grid centered>
-            <Grid.Row >
-                <Grid.Column width={15}>
-                <Divider section horizontal>
-                    <Header as="h1" textAlign="center">List of Quality Models</Header> 
-                </Divider>
-                </Grid.Column>
-            </Grid.Row>
+                <Grid.Row >
+                    <Grid.Column>
+                        <Divider section horizontal>
+                            <Header as="h1" textAlign="center">List of Quality Models</Header> 
+                        </Divider>
+                    </Grid.Column>
+                </Grid.Row>
             </Grid>
-            <br/>
             {
             //if apiData is null, then it is because the response from the API hasn't arrived
             apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
                 <Grid columns={1} centered> 
                     <Grid.Column>
                         <Container>
-                            <Form onSubmit={filterSubmitHandler}> 
-                                <Form.Group inline>
+                            <p align="right">
+                                <Button color='blue' onClick={createQualityModelButtonHandler}> 
+                                    Create Quality Model 
+                                </Button>
+                            </p>
+                            <Form widths='equal'  onSubmit={filterSubmitHandler}> 
+                                <Form.Group>
                                     <Form.Input name="qualityModelsFilter" onChange={filterChangeHandler} label="Filter by name or id"/>
                                     <Form.Input name = "metricsFilter" onChange={filterChangeHandler} label="Filter by Metric's name or id"/>
-                                    <Button color='blue' type='submit' icon>
-                                        Filter
-                                        <Icon name='filter' />
-                                    </Button>
-                                    <Button color='blue' 
-                                        style={{marginLeft: "auto"}} 
-                                        floated='right' 
-                                        onClick={createQualityModelButtonHandler}
-                                    > 
-                                        Create Quality Model 
-                                    </Button>
+                                    <Form.Field style={{marginTop: "auto"}}>
+                                        <Form.Button color='blue' type='submit' icon>
+                                            Filter
+                                            <Icon name='filter' />
+                                        </Form.Button>
+                                    </Form.Field>
                                 </Form.Group>
-                                
                             </Form>
                             { 
                             apiDataProcessed === false ? <Loader active inline='centered'> Retrieving content </Loader>:
-
-                            <Table textAlign="center" compact celled selectable> 
+                            
+                            <Table textAlign="center" celled selectable> 
                                 <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
                                 <TableBody baserowpathlink={currpath} data={apiData} tableHeaders = {tableBodyJSONProps}></TableBody>
                                 <TablePagination numberOfColumns={tableHeaders.length}/>

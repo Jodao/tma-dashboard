@@ -151,11 +151,12 @@ function ApiModule() {
       )
   }
 
-  //return list of currently monitored resources
-  function getActiveResources(){
+  //return list of currently monitored resources. queryParams specify if the resources to be retrieved should have actions
+  //associated in the case of creating a rule ('createRule' param should be set to true). 
+  function getActiveResources(queryParams){
     let endpoint = apiURL + "getResources"
     //axios.get() returns a promise, thereby when the response is received it is treated
-    return axios.get(endpoint).then((res) => 
+    return axios.get(endpoint,{params: queryParams}).then((res) => 
         {
           return res.data["resources"]
         }
@@ -249,12 +250,12 @@ function ApiModule() {
     //axios.get() returns a promise, thereby when the response is received it is treated
     return axios.post(endpoint,body).then((res) => 
         {
-          return res.data["plotConfigId"]
+          return res
         }
       ).catch(function (error) 
         {
           console.log('Error:', error.message);
-          return null
+          return error.response
         }
       )
   }
@@ -264,12 +265,12 @@ function ApiModule() {
     //axios.get() returns a promise, thereby when the response is received it is treated
     return axios.put(endpoint,body).then((res) => 
         {
-          return res.status
+          return res
         }
       ).catch(function (error) 
         {
           console.log('Error:', error.message);
-          return null
+          return error.response
         }
       )
   }
@@ -285,6 +286,85 @@ function ApiModule() {
         {
           console.log('Error:', error.message);
           return null
+        }
+      )
+  }
+
+  //return list of rules names
+  function getRulesNames(queryParams){
+    let endpoint = apiURL + "getRules"
+    //axios.get() returns a promise, thereby when the response is received it is treated
+    return axios.get(endpoint,{params: queryParams}).then((res) => 
+        {
+          return res.data["rulesNames"]
+        }
+      ).catch(function (error) 
+        {
+          console.log('Error:', error.message);
+          return null
+        }
+      )
+  }
+
+  //return deatils of a rule
+  function getRuleCode(ruleName){
+    let endpoint = apiURL + "getRules/" + ruleName
+    //axios.get() returns a promise, thereby when the response is received it is treated
+    return axios.get(endpoint).then((res) => 
+        {
+          return res.data["ruleDetail"]
+        }
+      ).catch(function (error) 
+        {
+          console.log('Error:', error.message);
+          return null
+        }
+      )
+  }
+
+  function removeRule(ruleName){
+    let endpoint = apiURL + "removeRule/" + ruleName
+    //axios.get() returns a promise, thereby when the response is received it is treated
+    return axios.delete(endpoint).then((res) => 
+        {
+          return res.data
+        }
+      ).catch(function (error) 
+        {
+          console.log('Error:', error.message);
+          return null
+        }
+      )
+  }
+
+  function getActionsAndConfigsByResource(queryParams){
+    let endpoint = apiURL + "getActions/"
+    //axios.get() returns a promise, thereby when the response is received it is treated
+    return axios.get(endpoint,{params: queryParams}).then((res) => 
+        {
+          return res.data
+        }
+      ).catch(function (error) 
+        {
+          console.log('Error:', error.message);
+          return null
+        }
+      )
+  }
+
+  //create an adaptation rule
+  function createRule(body){
+    let endpoint = apiURL + "addRule"
+    //perform post request and return response data, even if response code != 200
+    return axios.post(endpoint,body).then((res) => 
+        {
+          return res["data"]
+        }
+      ).catch(function (error) 
+        {
+          console.log('Error:', error.message);
+          console.log('Error contents:', error.response);
+          return error.response["data"]
         }
       )
   }
@@ -307,7 +387,12 @@ function ApiModule() {
     getPlotsConfigs,
     savePlotConfig,
     replacePlotConfig,
-    deletePlotConfig
+    deletePlotConfig,
+    getRulesNames,
+    getRuleCode,
+    removeRule,
+    getActionsAndConfigsByResource,
+    createRule,
   };
 
 }

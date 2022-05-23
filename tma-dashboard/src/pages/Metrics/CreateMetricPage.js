@@ -1,11 +1,11 @@
-import {Button, Loader, Divider, Label, Header, Grid, Form, Container, Segment, Message, Modal} from 'semantic-ui-react'
+import { Loader, Divider, Label, Header, Grid, Form, Container, Segment, Message} from 'semantic-ui-react'
 import ApiModule from "../../utils/api/ApiModule"
 import React, {useState, useEffect} from "react"
-import { useNavigate} from "react-router-dom"
 import TreeRender from '../../utils/treeRendering/TreeRender';
 import TreeRenderFunctionsUtils from '../../utils/treeRendering/TreeRenderFunctionsUtils';
 import DropDownDataFormat from '../../utils/dropDownDataFormat/DropDownDataFormat';
 import ValidInputs from '../../utils/ValidInputs'
+import CustomModal from '../../components/CustomModal';
 
 function CreateMetricPage(props){
     //============================================= VARIABLES DECLARATIONS ============================================//
@@ -79,9 +79,9 @@ function CreateMetricPage(props){
     //Variable use to toggle different views on the form fields depending of the choice of creatint or not a Leaf Metric
     const[leafAttribute, setLeafAttribute] = useState(false);
 
+    const [formErrorDisplay, setFormErrorDisplay] = useState(false);
 
     const [postResponseMessage, setPostResponseMessage] = useState({"openModal": false})
-    let navigate = useNavigate();
 
     //=========================================== PRE-LOAD OF DESCRIPTIONS AND METRICS ========================================//
     
@@ -241,6 +241,8 @@ function CreateMetricPage(props){
                 openModal: true
             }
         )
+        setFormErrorDisplay(true)
+        
     }
 
     function formFieldInputChangeHandler(ev,atts){
@@ -248,19 +250,6 @@ function CreateMetricPage(props){
         newFormData[atts.name] = atts.value
         setMetricToCreate(newFormData)
     }
-
-    function modalCloseHandler(ev,atts){
-        if(postResponseMessage.messageType === "success"){
-            navigate("/getMetrics")
-        }
-        setPostResponseMessage(
-            {
-                ...postResponseMessage,
-                openModal: false
-            }
-        )
-    }
-    
     
     return(
         <div>
@@ -281,15 +270,14 @@ function CreateMetricPage(props){
             :
             <Container >
                 <Segment>
-                    <Form widths={"equal"}>  
+                    <Form widths="equal">  
                         <Form.Group >
-                            <Form.Input width={4} required
+                            <Form.Input required
                                 name="metricName"  
-                                label='Metric name' 
-                                placeholder='Insert metric name' 
+                                label='Metric name'
                                 onChange={formFieldInputChangeHandler}
                                 error={
-                                    !ValidInputs().validStringOrDropDownSelection(metricToCreate.metricName) ?
+                                    formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(metricToCreate.metricName) ?
                                     { content: 'Please enter a name for the Metric', pointing: 'above' }
                                     :
                                     null
@@ -316,7 +304,7 @@ function CreateMetricPage(props){
                                     onChange={formFieldInputChangeHandler}
                                     name="descriptionId"
                                     error={
-                                        !ValidInputs().validStringOrDropDownSelection(metricToCreate.descriptionId) ?
+                                        formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(metricToCreate.descriptionId) ?
                                         { content: 'Please choose a description', pointing: 'above' }
                                         :
                                         null
@@ -333,7 +321,7 @@ function CreateMetricPage(props){
                                     onChange={formFieldInputChangeHandler}
                                     name="metricAggregationOperator"
                                     error={
-                                        !ValidInputs().validStringOrDropDownSelection(metricToCreate.metricAggregationOperator) ?
+                                        formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(metricToCreate.metricAggregationOperator) ?
                                         { content: 'Please select an aggregation operator', pointing: 'above' }
                                         :
                                         null
@@ -350,7 +338,7 @@ function CreateMetricPage(props){
                                     onChange={formFieldInputChangeHandler}
                                     name="normalizationMethod"
                                     error={
-                                        !ValidInputs().validStringOrDropDownSelection(metricToCreate.normalizationMethod) ?
+                                        formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(metricToCreate.normalizationMethod) ?
                                         { content: 'Please select a normalization method', pointing: 'above' }
                                         :
                                         null
@@ -367,7 +355,7 @@ function CreateMetricPage(props){
                                     onChange={formFieldInputChangeHandler}
                                     name="normalizationKind"
                                     error={
-                                        !ValidInputs().validStringOrDropDownSelection(metricToCreate.normalizationKind) ?
+                                        formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(metricToCreate.normalizationKind) ?
                                         { content: 'Please select a normalization kind', pointing: 'above' }
                                         :
                                         null
@@ -375,37 +363,34 @@ function CreateMetricPage(props){
                                 />
                             </Form.Group>
                             <Form.Group>
-                                <Form.Input fluid required 
+                                <Form.Input required 
                                     name="numSamples"
-                                    label='Number of Samples' 
-                                    placeholder='Insert number of samples'
+                                    label='Number of Samples'
                                     onChange={formFieldInputChangeHandler}
                                     error={
-                                        !ValidInputs().validIntGreaterThanZero(metricToCreate.numSamples) ?
+                                        formErrorDisplay && !ValidInputs().validIntGreaterThanZero(metricToCreate.numSamples) ?
                                         { content: 'Please enter an integer number > 0', pointing: 'above' }
                                         :
                                         null
                                     }
                                 />
-                                <Form.Input fluid required
+                                <Form.Input  required
                                     name="minimumThreshold"
-                                    label='Minimum Threshold' 
-                                    placeholder='Insert minimum threshold'
+                                    label='Minimum Threshold'
                                     onChange={formFieldInputChangeHandler}
                                     error={
-                                        !ValidInputs().validFloat(metricToCreate.minimumThreshold) ?
+                                        formErrorDisplay && !ValidInputs().validFloat(metricToCreate.minimumThreshold) ?
                                         { content: 'Please enter a float number like 2.33', pointing: 'above' }
                                         :
                                         null
                                     }
                                 />
-                                <Form.Input fluid required 
+                                <Form.Input required 
                                     name="maximumThreshold"
                                     label='Maximum Threshold' 
-                                    placeholder='Insert maximum threshold'
                                     onChange={formFieldInputChangeHandler}
                                     error={
-                                        !ValidInputs().validFloat(metricToCreate.maximumThreshold) ?
+                                        formErrorDisplay && !ValidInputs().validFloat(metricToCreate.maximumThreshold) ?
                                         { content: 'Please enter a float number like 2.33', pointing: 'above' }
                                         :
                                         null
@@ -434,7 +419,7 @@ function CreateMetricPage(props){
                                     label='Associate child metrics'
                                     name="childMetrics"
                                     error={
-                                        !ValidInputs().validDropDownMultipleSelection(metricToCreate.childMetrics) ?
+                                        formErrorDisplay && !ValidInputs().validDropDownMultipleSelection(metricToCreate.childMetrics) ?
                                         { content: 'Please choose, at least, one child metric', pointing: 'above' }
                                         :
                                         null
@@ -451,7 +436,7 @@ function CreateMetricPage(props){
                                     onChange={formFieldInputChangeHandler}
                                     name="attributeAggregationOperator"
                                     error={
-                                        !ValidInputs().validStringOrDropDownSelection(metricToCreate.attributeAggregationOperator) ?
+                                        formErrorDisplay && !ValidInputs().validStringOrDropDownSelection(metricToCreate.attributeAggregationOperator) ?
                                         { content: 'Please select an attribute aggregation operator', pointing: 'above' }
                                         :
                                         null
@@ -477,27 +462,10 @@ function CreateMetricPage(props){
                         }
                     </Form>
                 </Segment>
-                <Modal centered={false} closeIcon open={postResponseMessage["openModal"]} onClose={modalCloseHandler}>
-                    <Modal.Header>Message</Modal.Header>
-                    <Modal.Content>
-                        <Message 
-                        color= {
-                                postResponseMessage["messageType"] === "success" ? 
-                                "green"
-                                :postResponseMessage["messageType"] === "warning" ?
-                                "orange"
-                                : "red" 
-                            }
-                        >
-                            <Message.Header>{postResponseMessage["message"]}</Message.Header>
-                        </Message>
-                    </Modal.Content>
-                    <Modal.Actions>
-                        <Button color='grey' onClick={modalCloseHandler}>
-                            Close
-                        </Button>
-                    </Modal.Actions>
-                </Modal>
+                <CustomModal 
+                    successPath="/getMetrics" 
+                    modalInfo={postResponseMessage} 
+                />
             </Container>
             }
         </div>

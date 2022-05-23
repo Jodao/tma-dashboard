@@ -63,16 +63,16 @@ function ViewConfigurationProfilePage(props){
         return(
             <Table.Row key={uniqueId++}>
                 <Table.Cell key={uniqueId++}>
-                    <Label color='grey'> {metric["metricName"]} </Label>
+                    {metric["metricName"]}
                 </Table.Cell>
                 <Table.Cell key={uniqueId++}>
                     <Form.Field>
-                        <input type='number' value={preference.weight} readOnly />
+                        {preference.weight}
                     </Form.Field>
                 </Table.Cell>
                 <Table.Cell key={uniqueId++}>
                     <Form.Field>
-                        <input type='number' value={preference.threshold} readOnly />
+                        {preference.threshold}
                     </Form.Field>
                 </Table.Cell>
             </Table.Row>
@@ -92,61 +92,61 @@ function ViewConfigurationProfilePage(props){
             </Grid>
             {configurationProfile !== null ?
                 <Container>
-                    <Segment>
-                        <Grid columns={2}>
-                            <Grid.Column>
-                                <Segment>
-                                    <Header as="h3" textAlign="center"> Quality Model information</Header>
-                                    <Form widths='equal'>
-                                        <Form.Group >
-                                            <Form.Field>
-                                                <label>qualityModelId</label>
-                                                <input type='number' value={qualityModelData["qualityModelId"]} readOnly/>
-                                            </Form.Field>
-                                            <Form.Field>
-                                                <label>modelName</label>
-                                                <input type='text' value={qualityModelData["modelName"]} readOnly />
-                                            </Form.Field>
-                                        </Form.Group>
-                                    </Form>
-                                </Segment>
-                                <Segment>
-                                    <Header as="h3" textAlign="center"> Weighted metrics tree</Header>
-                                    <TreeRender width={"100%"} height={"50vh"} 
-                                        preferences={configurationProfile.preferences}
-                                        data={qualityModelData["metric"]} 
-                                        configurationProfile={true}
-                                    />
-                                </Segment>
-                            </Grid.Column>
-                            <Grid.Column>
-                                <Segment>
-                                    <Header as="h3" textAlign="center"> Configuration Profile information</Header>
-                                    <Form>
-                                        <Form.Group grouped>
-                                            <Form.Field width={8} >
-                                                <label>profileName</label>
-                                                <input type='text' value={configurationProfile["profileName"]} readOnly/>
-                                            </Form.Field>
-                                            <Divider section horizontal>
-                                                <Header as="h5" textAlign="center">Metrics weigths and thresholds</Header>     
-                                            </Divider>
-                                            <Table  
-                                            style = {{marginLeft: "auto", marginRight: "auto"}} 
-                                            textAlign="center" 
-                                            compact 
-                                            collapsing  
-                                            celled 
-                                            selectable> 
-                                                <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
-                                                {generateCustomTableBody()}
-                                            </Table> 
-                                        </Form.Group>
-                                    </Form>
-                                </Segment>
-                            </Grid.Column>
-                        </Grid>           
-                    </Segment>
+                    <Grid columns={2}>
+                        <Grid.Column>
+                            <Segment>
+                                <Header as="h3" textAlign="center"> Quality Model information</Header>
+                                <Divider/>
+                                <Form widths='equal'>
+                                    <Form.Group >
+                                        <Form.Field>
+                                            <label>Id:</label>
+                                            {qualityModelData["qualityModelId"]}
+                                        </Form.Field>
+                                        <Form.Field>
+                                            <label>Name:</label>
+                                            {qualityModelData["modelName"]}
+                                        </Form.Field>
+                                    </Form.Group>
+                                </Form>
+                            </Segment>
+                            <Segment>
+                                <Header as="h3" textAlign="center"> Weighted metrics tree</Header>
+                                <Divider/>
+                                <TreeRender width={"100%"} height={"50vh"} 
+                                    preferences={configurationProfile.preferences}
+                                    data={qualityModelData["metric"]} 
+                                    configurationProfile={true}
+                                />
+                            </Segment>
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Segment>
+                                <Header as="h3" textAlign="center"> Configuration Profile information</Header>
+                                <Divider/>
+                                <Form>
+                                    <Form.Group grouped>
+                                        <Form.Field width={8} >
+                                            <label>Name:</label>
+                                            {configurationProfile["profileName"]}   
+                                        </Form.Field>
+                                        <Divider section horizontal>
+                                            <Header as="h5" textAlign="center">Metrics weigths and thresholds</Header>     
+                                        </Divider>
+                                        <Table  
+                                        style = {{marginLeft: "auto", marginRight: "auto"}} 
+                                        textAlign="center" 
+                                        compact   
+                                        celled 
+                                        selectable> 
+                                            <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
+                                            {generateCustomTableBody()}
+                                        </Table> 
+                                    </Form.Group>
+                                </Form>
+                            </Segment>
+                        </Grid.Column>
+                    </Grid>  
                 </Container>
                 :<Loader active inline='centered'> Retrieving content </Loader>
             }

@@ -47,79 +47,82 @@ function ViewQualityModelPage(){
             {
                 //if apiData is null, then it is because the response from the API hasn't arrived
                 apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
-                <div>
-                    <Container>
-                        <Segment>
-                            <Form widths="equal">
-                                <Form.Group>
-                                    <Form.Field>
-                                        <label>Id:</label>
-                                        {apiData["qualityModelId"]}
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <label>Name:</label>
-                                        {apiData["modelName"]}
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <label>Description Reference:</label>
-                                        {apiData["modelDescriptionReference"]}
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <label>Business Threshold:</label>
-                                        {apiData["businessThreshold"]}
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <label>Metric Id:</label>
-                                        {apiData["metric"]["metricId"]}
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <label>Metric Name:</label>
-                                        {apiData["metric"]["metricName"]}
-                                    </Form.Field>
-                                </Form.Group>
-                            </Form>
-                        </Segment>
-                        <Grid columns={2}>
-                                <Grid.Column>
-                                    <Segment>
-                                        <Grid columns={1}>
-                                            <Grid.Column>
-                                                <Header as="h4" textAlign="center"> Configuration Profiles associated</Header>
-                                                <Divider/>
-                                                <Button style={{marginBottom: "2vh"}} color='blue' 
-                                                    onClick={addProfileButtonHandler} floated='right'
-                                                >
-                                                    Add Profile
-                                                </Button>
-                                                <Table
-                                                    textAlign="center" 
-                                                    compact   
-                                                    celled 
-                                                    selectable
-                                                > 
-                                                    <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
-                                                    <TableBody 
-                                                        rowlinkdata={apiData}
-                                                        baserowpathlink={"/getConfigurationProfile"} 
-                                                        data={apiData["configurationProfiles"]} 
-                                                        tableHeaders = {tableBoodyJSONProps}
-                                                    />
-                                                    <TablePagination numberOfColumns={tableHeaders.length}/>
-                                                </Table>   
-                                            </Grid.Column>
-                                        </Grid>
-                                    </Segment>
-                                </Grid.Column>
-                                <Grid.Column>
-                                    <Segment>
-                                        <Header as="h4" textAlign="center"> Metrics tree</Header>
-                                        <Divider/>
-                                        <TreeRender width={"100%"} height={"50vh"} data={apiData["metric"]}/>
-                                    </Segment>
-                                </Grid.Column> 
-                        </Grid>
-                    </Container>
-            </div>
+                <Container>
+                    <Grid stackable columns={2}>
+                        <Grid.Row>
+                            <Grid.Column width="16">
+
+                                <Segment>
+                                    <Form widths="equal">
+                                        <Form.Group>
+                                            <Form.Field>
+                                                <label>Id:</label>
+                                                {apiData["qualityModelId"]}
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Name:</label>
+                                                {apiData["modelName"]}
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Description Reference:</label>
+                                                {apiData["modelDescriptionReference"]}
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Business Threshold:</label>
+                                                {apiData["businessThreshold"]}
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Metric Id:</label>
+                                                {apiData["metric"]["metricId"]}
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Metric Name:</label>
+                                                {apiData["metric"]["metricName"]}
+                                            </Form.Field>
+                                        </Form.Group>
+                                    </Form>
+                                </Segment>
+                            </Grid.Column>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Segment>
+                                    <Header as="h4" textAlign="center"> Metrics tree</Header>
+                                    <Divider/>
+                                    <TreeRender width={"100%"} height={"50vh"} data={apiData["metric"]}/>
+                                </Segment>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Segment >
+                                    <Grid columns={1}>
+                                        <Grid.Column>
+                                    <Header as="h4" textAlign="center"> Configuration Profiles associated</Header>
+                                    <Divider/>
+                                    <p align="right">
+                                        <Button color='blue' onClick={addProfileButtonHandler}>Add Profile</Button>
+                                    </p>
+                                    <Table style = {{marginLeft: "auto", marginRight: "auto"}} 
+                                        textAlign="center"    
+                                        celled 
+                                        selectable
+                                        compact
+                                    > 
+                                        <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
+                                        <TableBody 
+                                            rowlinkdata={apiData}
+                                            baserowpathlink={"/getConfigurationProfile"} 
+                                            data={apiData["configurationProfiles"]} 
+                                            tableHeaders = {tableBoodyJSONProps}
+                                        />
+                                        <TablePagination numberOfColumns={tableHeaders.length}/>
+                                    </Table>
+                                    </Grid.Column>  
+                                    </Grid> 
+                                </Segment>
+                            </Grid.Column> 
+                        </Grid.Row>
+                    </Grid>
+                </Container>
             }
         
         </div>

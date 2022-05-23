@@ -42,7 +42,22 @@ function DropDownDataFormat(){
         setResourcesFunc(formattedResources)
     }
 
-    return{convertMetrics,convertDescriptions,convertResources}
+    function convertActions(originalActions, setActionsFunc){
+        let formattedActions = []
+        for(var action of originalActions){
+            let resourceTemp = {
+                chosen: "false",
+                key: action["actionId"],
+                value: action["actionId"],
+                text:  "[id = " + action["actionId"].toString() 
+                + "] " + action["actionName"]
+            }
+            formattedActions.push(resourceTemp)
+        }
+        setActionsFunc(formattedActions)
+    }
+
+    return{convertMetrics,convertDescriptions,convertResources,convertActions}
 }
 
 export default DropDownDataFormat;

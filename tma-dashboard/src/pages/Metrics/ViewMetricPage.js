@@ -60,7 +60,7 @@ function ViewMetricPage(){
             //if apiData is null, then it is because the response from the API hasn't arrived
             apiData === null ? <Loader active inline='centered'> Retrieving content</Loader> :
             <Container>
-                <Grid columns={2}>
+                <Grid stackable columns={2}>
                     <Grid.Column>
                         <Segment>
                             <Header as="h3" textAlign="center"> Metric Information</Header>

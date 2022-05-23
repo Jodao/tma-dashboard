@@ -39,7 +39,7 @@ function TablePagination(props){
         <Table.Footer>
             <Table.Row>
                 <Table.HeaderCell colSpan={props["numberOfColumns"]}>
-                    <Menu pointing secondary compact>
+                    <Menu pointing secondary compact stackable>
                         <Menu.Item 
                             as={(currIndex === 0 && paginationItems[0] === 1) ? "div" : "a" }
                             disabled = {currIndex === 0 && paginationItems[0] === 1 } icon onClick={goBackPaginationHandler}>

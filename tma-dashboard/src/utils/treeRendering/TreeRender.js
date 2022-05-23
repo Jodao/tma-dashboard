@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { Canvas, Edge, Node, Label } from 'reaflow';
-import {Loader, Button } from "semantic-ui-react"
+import {Loader, Button, Icon} from "semantic-ui-react"
 import TreeLabel from "./TreeLabel"
 
 
@@ -134,38 +134,44 @@ function TreeRender (props,ref) {
     return (
       treeReady === true ?
       <div>
+        <div>
+          <p style={{marginBottom:"5px"}} align="right">
+            <Button icon color='blue' onClick={zoomIn}> 
+              <Icon name='zoom-in'/>
+            </Button>
+            <Button icon color='blue' onClick={zoomOut}> 
+              <Icon name='zoom-out'/>
+            </Button>
+          </p>
+        </div>  
         <div ref={canvasDivRef}>
-            <Canvas
-                disabled={true}
-                arrow={null}
-                height={ props["height"]}
-                width={ props["width"]}
-                nodes={nodes}
-                edges={edges}
-                readonly = {true}
-                animated = {false}
-                direction= "UP"
-                ref= {canvasRef}
-                fit = {true}
-                minZoom = {-0.9}
-                zoomable = {false}
-                node={
-                  <Node
-                    style={{ stroke: 'black', fill: '#ffe6cc', strokeWidth: 3}}
-                    label={<TreeLabel node={true}/>}
-                  />
-                }
-                edge={<Edge 
-                        style={{ stroke: 'black', strokeWidth: 2 }}
-                        label={<TreeLabel node={false}/>}
-                      />}
-            />
+          <Canvas
+              disabled={true}
+              arrow={null}
+              height={ props["height"]}
+              width={ props["width"]}
+              nodes={nodes}
+              edges={edges}
+              readonly = {true}
+              animated = {false}
+              direction= "UP"
+              ref= {canvasRef}
+              fit = {true}
+              minZoom = {-0.9}
+              zoomable = {false}
+              node={
+                <Node
+                  style={{ stroke: 'black', fill: '#ffe6cc', strokeWidth: 3}}
+                  label={<TreeLabel node={true}/>}
+                />
+              }
+              edge={<Edge 
+                      style={{ stroke: 'black', strokeWidth: 2 }}
+                      label={<TreeLabel node={false}/>}
+                    />}
+          />
           {/* NODE LABEL:            label={<Label style={{ fill: 'black', fontWeight: "900"}}>*/ }
-          <Button.Group vertical style={{position: "absolute", bottom:0, right:0, marginBottom: "4vh", marginRight: "3vw"}}>
-            <Button style={{marginBottom: "1vh"}} onClick={zoomIn} > Zoom In</Button>
-            <Button onClick={zoomOut}> Zoom Out</Button>
-          </Button.Group>
-        </div>
+        </div> 
       </div>: <Loader active inline='centered'> Constructing tree </Loader>
     )
 }

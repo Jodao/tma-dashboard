@@ -182,7 +182,7 @@ function PlotResourceMetricsPage(){
         // if form validation wasn't successful, then present form field errors
         setFormErrorDisplay(true)
     }
-
+    
     async function step3LiveData(){
         //get current location to verify if navbar was clicked and thereby stop executing this function in a loop
         let currLocation = window.location.href.split("/")
@@ -350,15 +350,16 @@ function PlotResourceMetricsPage(){
 
     function step2(){
         return (
-            <Segment>
+            <div>
             {
             chosenResource === null ?
                 <Loader active inline='centered'> Retrieving content </Loader>
             :
-                <Grid columns={2}>
+                <Grid stackable columns={2}>
                     <Grid.Column>
                         <Segment>
                             <Header as="h3" textAlign="center"> Weighted metrics tree</Header>
+                            <Divider/>
                             <TreeRender width={"100%"} height={"50vh"} 
                                 preferences={configurationProfile.preferences}
                                 data={qualityModel["metric"]} 
@@ -463,7 +464,7 @@ function PlotResourceMetricsPage(){
                     </Grid.Column>
                 </Grid>
             }
-            </Segment>
+            </div>
         )
     }
 
@@ -490,7 +491,22 @@ function PlotResourceMetricsPage(){
                             Export Plot Config
                     </Button>
                     <p/>
-                    <Plot plotData = {plotData}/>
+                    <Plot 
+                        plotPath="getResources"
+                        plotData = {plotData} 
+                        startDate={
+                            typeof(formData.startDate) === "object" ?
+                                formData.startDate
+                            :
+                                new Date(formData.startDate)
+                        } 
+                        endDate={
+                            typeof(formData.endDate) === "object" ?
+                                formData.endDate
+                            :
+                                new Date(formData.endDate)
+                        } 
+                    />
                 </div>
             }
             </Segment>

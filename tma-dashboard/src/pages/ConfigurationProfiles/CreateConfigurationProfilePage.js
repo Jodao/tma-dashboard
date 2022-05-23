@@ -1,16 +1,17 @@
-import { Button, Divider, Label, Header, Grid, Form, Container, Segment, Message,Table, Modal} from 'semantic-ui-react'
+import {Divider, Label, Header, Grid, Form, Container, Segment,Table} from 'semantic-ui-react'
 import ApiModule from "../../utils/api/ApiModule"
 import React, {useState, useEffect, useRef} from "react"
-import {useNavigate,useLocation} from "react-router-dom"
+import {useLocation} from "react-router-dom"
 import TreeRender from '../../utils/treeRendering/TreeRender';
 import TableHeader from "../../components/tables/TableHeader"
 import ValidInputs from '../../utils/ValidInputs';
+import CustomModal from '../../components/CustomModal';
 
 function CreateConfigurationProfilePage(){
     const tableHeaders = [
-        "metricName", 
-        <p>weight<font color='red'>*</font></p>,
-        <p>threshold<font color='red'>*</font></p>
+        "Name", 
+        <p>weight<font color='#990000'>*</font></p>,
+        <p>threshold<font color='#990000'>*</font></p>
     ]
 
     //formData
@@ -20,6 +21,8 @@ function CreateConfigurationProfilePage(){
     
     const [qualityModelListOfMetrics,setQualityModelListOfMetrics] = useState(null)
     
+    const [formErrorDisplay, setFormErrorDisplay] = useState(false);
+
     //holds message from API response to request and any other messages to be presented to the user
     const [postResponseMessage, setPostResponseMessage] = useState({"openModal": false})
 
@@ -28,8 +31,6 @@ function CreateConfigurationProfilePage(){
 
     //ref for the metric tree representation, so updates can be performed during form filling
     const metricsTreeRef = useRef();
-
-    let navigate = useNavigate();
 
     useEffect(()=>{
         let listOfMetrics = []
@@ -76,7 +77,7 @@ function CreateConfigurationProfilePage(){
         return(
             <Table.Row key={uniqueId++}>
                 <Table.Cell key={uniqueId++}>
-                    <Label color='grey'> {metric["metricName"]} </Label>
+                    {metric["metricName"]}
                 </Table.Cell>
                 <Table.Cell key={uniqueId++}>
                     <Form.Input name="weight" metricid={metric["metricId"]} 
@@ -95,14 +96,16 @@ function CreateConfigurationProfilePage(){
     }
     
     function validInput(formInputName,metricId){
-        if (formInputName === "weight" || formInputName === "threshold"){
-            if(!ValidInputs().validFloatBetweenZeroAndOne(preferences[metricId][formInputName])){
-                return { content: 'Please enter a float number where  0.0 <= number <= 1.0', pointing: 'above' }
+        if(formErrorDisplay){
+            if (formInputName === "weight" || formInputName === "threshold"){
+                if(!ValidInputs().validFloatBetweenZeroAndOne(preferences[metricId][formInputName])){
+                    return { content: 'Please enter a float number where  0.0 <= number <= 1.0', pointing: 'above' }
+                }
             }
-        }
-        else if (formInputName === "profileName"){
-            if(!ValidInputs().validStringOrDropDownSelection(profileName)){
-                return { content: 'Please enter a name for the Configuration Profile', pointing: 'above' }
+            else if (formInputName === "profileName"){
+                if(!ValidInputs().validStringOrDropDownSelection(profileName)){
+                    return { content: 'Please enter a name for the Configuration Profile', pointing: 'above' }
+                }
             }
         }
         //null => doesn't show error/tip message
@@ -125,6 +128,27 @@ function CreateConfigurationProfilePage(){
         }
     }
     
+    //used to validate that childs of a parent metric have a sum of weights = 1
+    function validWeightsSum(parentMetric){
+        //reached a leaf metric
+        if(parentMetric.childMetrics.length === 0){
+            return true
+        }
+        else{
+            let sum = 0
+            for(let child of parentMetric.childMetrics){
+                if(!validWeightsSum(child))
+                    return false
+                sum += parseFloat(preferences[child.metricId]["weight"])
+            }
+            if(sum !== 1){
+                console.log(sum)
+                return false
+            }
+            return true
+        }
+    }
+
     async function submitHandler(ev){
         ev.preventDefault()
         let valid = true
@@ -133,7 +157,7 @@ function CreateConfigurationProfilePage(){
             let aux
             for(let metricId in preferences){
                 aux = ValidInputs().validFloatBetweenZeroAndOne(preferences[metricId]["weight"]) 
-                || ValidInputs().validFloatBetweenZeroAndOne(preferences[metricId]["threshold"]);
+                && ValidInputs().validFloatBetweenZeroAndOne(preferences[metricId]["threshold"]);
                 if(aux === false){
                     valid=false
                     break;
@@ -145,6 +169,18 @@ function CreateConfigurationProfilePage(){
         }
 
         if(valid){
+            //then it is not valid and customize message
+            if(!validWeightsSum(qm.metric)){
+                setPostResponseMessage(
+                    {
+                        messageType: "error",
+                        message: "Sibling metrics must have the sum of their weights equal to 1. Please, rectify the weights.",
+                        openModal: true
+                    }
+                )
+                return
+            }
+
             //process data into a format acceptable by the API
             let postData = {preferences:[]}
             for(let [key, value] of Object.entries(preferences)){
@@ -173,21 +209,8 @@ function CreateConfigurationProfilePage(){
                     openModal: true
                 }
             )
+            setFormErrorDisplay(true)
         }
-    }
-
-    function modalCloseHandler(ev,atts){
-        if(postResponseMessage.messageType === "success"){
-            //go back to ViewQualityModelPage
-            navigate("/getQualityModels/" + qm["qualityModelId"])
-        }
-        //close modal if API response wasn't successful
-        setPostResponseMessage(
-            {
-                ...postResponseMessage,
-                openModal: false
-            }
-        )
     }
 
     return(
@@ -207,15 +230,15 @@ function CreateConfigurationProfilePage(){
                         <Segment >
                             <Header as="h3" textAlign="center"> Quality Model information</Header>
                             <Divider/>
-                            <Form>
+                            <Form widths='equal'>
                                 <Form.Group >
                                     <Form.Field>
-                                        <label>qualityModelId</label>
-                                        <input type='number' value={qm["qualityModelId"]} readOnly/>
+                                        <label>Id:</label>
+                                        {qm["qualityModelId"]}
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>modelName</label>
-                                        <input type='text' value={qm["modelName"]} readOnly />
+                                        <label>Name:</label>
+                                        {qm["modelName"]}
                                     </Form.Field>
                                 </Form.Group>
                             </Form>
@@ -230,68 +253,44 @@ function CreateConfigurationProfilePage(){
                         <Segment compact >
                             <Header as="h3" textAlign="center"> Configuration Profile</Header>
                             <Divider/>
-                            <Form>
-                                <Form.Group grouped>
-                                    <Form.Group>
-                                        <Grid columns={2}>
-                                            <Grid.Column> 
-                                                <Form.Input  required label='profileName' name="profileName"
-                                                    onChange={formFieldInputChangeHandler}
-                                                    error={validInput("profileName",null)} 
-                                                />
-                                            </Grid.Column>
-                                            <Grid.Column> 
-                                                <Form.Button
-                                                color= "grey" circular type='submit' floated="right" onClick={submitHandler}> 
-                                                    Create Profile
-                                                </Form.Button> 
-                                            </Grid.Column>
-                                        </Grid>
-                                    </Form.Group>
-                                    <Divider section horizontal>
-                                        <Header as="h5" textAlign="center">Set metrics weigths and thresholds</Header>     
-                                    </Divider>
-                                    {preferences !== null ?
-                                        <Grid columns={1}>
-                                            <Grid.Column>
-                                            <Table textAlign="center" 
-                                                compact   
-                                                celled 
-                                                selectable
-                                                unstackable
-                                            > 
-                                                <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
-                                                {generateCustomTableBody()}
-                                            </Table> 
-                                        </Grid.Column>
-                                        </Grid>  
-                                    :null}
+                            <Form widths='equal'>
+                                <Form.Group>
+                                    <Form.Input  required label='Name' name="profileName"
+                                        onChange={formFieldInputChangeHandler}
+                                        error={validInput("profileName",null)} 
+                                    />
+                                
+                                    <Form.Button
+                                    color= "grey" circular type='submit' floated="right" onClick={submitHandler}> 
+                                        Create Profile
+                                    </Form.Button> 
                                 </Form.Group>
+                                <Divider section horizontal>
+                                    <Header as="h5" textAlign="center">Set metrics weigths and thresholds</Header>     
+                                </Divider>
+                                {preferences !== null ?
+                                    <Grid columns={1}>
+                                        <Grid.Column>
+                                        <Table textAlign="center" 
+                                            compact   
+                                            celled 
+                                            selectable
+                                            collapsing
+                                        > 
+                                            <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
+                                            {generateCustomTableBody()}
+                                        </Table> 
+                                    </Grid.Column>
+                                    </Grid>  
+                                :null}
                             </Form>
                         </Segment> 
                     </Grid.Column>          
                 </Grid>
-                <Modal centered={false} closeIcon open={postResponseMessage["openModal"]} onClose={modalCloseHandler}>
-                    <Modal.Header>Message</Modal.Header>
-                    <Modal.Content>
-                        <Message 
-                        color= {
-                                postResponseMessage["messageType"] === "success" ? 
-                                "green"
-                                :postResponseMessage["messageType"] === "warning" ?
-                                "orange"
-                                : "red" 
-                            }
-                        >
-                            <Message.Header>{postResponseMessage["message"]}</Message.Header>
-                        </Message>
-                    </Modal.Content>
-                    <Modal.Actions>
-                        <Button color='grey' onClick={modalCloseHandler}>
-                            Close
-                        </Button>
-                    </Modal.Actions>
-                </Modal>
+                <CustomModal 
+                    successPath={"/getQualityModels/" + qm["qualityModelId"]}
+                    modalInfo={postResponseMessage} 
+                />
             </Container>
         </div>
     )
