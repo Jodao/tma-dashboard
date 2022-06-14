@@ -275,17 +275,13 @@ function PlotResourceMetricsPage(){
 
     function exportPlotConfigsButtonHandler(){
         let obj = JSON.parse(JSON.stringify(formData))
-        if(typeof(obj.startDate) === "object"){
-            obj.startDate = obj.startDate.valueOf() / 1000
-            obj.endDate = obj.endDate.valueOf() / 1000
-        }
-        else{
-            obj.startDate = new Date(obj.startDate).valueOf() / 1000
-            obj.endDate = new Date(obj.endDate).valueOf() / 1000
-        }
+        
+        obj.startDate = Math.floor(new Date(obj.startDate).valueOf() / 1000)
+        obj.endDate = Math.floor(new Date(obj.endDate).valueOf() / 1000)
+        
         obj.metricLabel = plotData.dataSetMetric.label
-        let blob = new Blob([JSON.stringify(obj)],
-                { type: "text/plain;charset=utf-8" });
+        let blob = new Blob([JSON.stringify(obj,null, 2)],
+                { type: "application/json" });
 
         saveAs(blob, "plotConfig.txt");
     }
