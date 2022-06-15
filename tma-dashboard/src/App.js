@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react';
 import NavBar from "./components/layout/NavBar";
-import {Route, Routes} from 'react-router-dom';
+import {Route, Routes, Navigate} from 'react-router-dom';
 import {Loader} from 'semantic-ui-react';
 
 const ListMetricsPage = lazy(() => import('./pages/Metrics/ListMetricsPage'));
@@ -56,7 +56,7 @@ function App() {
           <Route path="/getAdaptationRules" element={<ListRulesPage currpath="/getAdaptationRules"/>}></Route>
           <Route path="/getAdaptationRules/:ruleName" element={<ViewRulePage/>}></Route>
           <Route path="/createAdaptationRule" element={<CreateRulePage/>}></Route>
-
+          <Route path="*" element={<Navigate replace to="/" />} />
         </Routes>
       </Suspense>
     </div>
