@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import NavBar from "./components/layout/NavBar";
 import {Route, Routes} from 'react-router-dom';
-
+import {Loader} from 'semantic-ui-react';
 
 const ListMetricsPage = lazy(() => import('./pages/Metrics/ListMetricsPage'));
 const ListQualityModelsPage = lazy(() => import('./pages/QualityModels/ListQualityModelsPage'));
@@ -23,7 +23,7 @@ function App() {
   return (
     <div>
       <NavBar/>
-      <Suspense fallback={<div>Loading...</div>}>     
+      <Suspense fallback={<Loader active inline='centered'> Retrieving content </Loader>}>     
         <Routes>
           <Route path="/" exact element={<HomePage/>}></Route>
 
