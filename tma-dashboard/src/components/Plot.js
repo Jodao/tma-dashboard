@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
 Chart as ChartJS,
 CategoryScale,
+LineController,
 LinearScale,
 PointElement,
 LineElement,
@@ -21,6 +22,7 @@ function Plot(props){
     
     ChartJS.register(
         CategoryScale,
+        LineController,
         LinearScale,
         PointElement,
         LineElement,
