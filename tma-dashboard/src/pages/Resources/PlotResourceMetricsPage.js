@@ -478,10 +478,12 @@ function PlotResourceMetricsPage(){
                             There are no data available for the defined selections. If "Live plot" option was selected, 
                             data may appear in the plot if any arrive in the database.
                         </Label>
-                    :
+                    : formData.dataType === "metric" ?
                         <Button onClick={simulateMetricsButtonHandler}>
                             Simulate Metrics
                         </Button>
+                    :
+                        null
                     }
                     <Button floated='right' onClick={exportPlotConfigsButtonHandler}>
                             Export Plot Config

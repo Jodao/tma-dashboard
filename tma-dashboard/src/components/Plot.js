@@ -10,6 +10,7 @@ Title,
 Tooltip,
 Legend,
 TimeScale,
+ScatterController,
 } from 'chart.js';
 import {Chart, getDatasetAtEvent, getElementAtEvent, getElementsAtEvent} from 'react-chartjs-2';
 import {Loader, Button, Icon} from 'semantic-ui-react';
@@ -30,6 +31,7 @@ function Plot(props){
         Tooltip,
         Legend,
         TimeScale,
+        ScatterController
     );
 
     const plotPath = props.plotPath;
