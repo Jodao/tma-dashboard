@@ -63,6 +63,8 @@ function ViewQualityModelPage(){
                                                 <label>Name:</label>
                                                 {apiData["modelName"]}
                                             </Form.Field>
+                                            {/* uncomment to show quality model's 
+                                            "Model Description Reference" and "Business Threshold" attributes
                                             <Form.Field>
                                                 <label>Description Reference:</label>
                                                 {apiData["modelDescriptionReference"]}
@@ -71,6 +73,7 @@ function ViewQualityModelPage(){
                                                 <label>Business Threshold:</label>
                                                 {apiData["businessThreshold"]}
                                             </Form.Field>
+                                            */}
                                             <Form.Field>
                                                 <label>Metric Id:</label>
                                                 {apiData["metric"]["metricId"]}

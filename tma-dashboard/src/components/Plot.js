@@ -79,6 +79,22 @@ function Plot(props){
         }
     }
 
+    //raw or metric data points dataset
+    let dataSetSimulation = {
+        //"label" and "data" properties missing from input
+        type: "line",
+        borderColor: '#ff0000',
+        backgroundColor: '#ff0000',
+        order: 3,
+        pointStyle: "circle",
+        radius: 7,
+        hoverRadius: 10,
+        parsing: {
+            xAxisKey: "valueTime",
+            yAxisKey: "value"
+        }
+    }
+
     // "datasets" is an array of dataset objects where each object holds its properties and the y and x axis values.  
     const [plotData,setPlotData] = useState(
         {
@@ -155,10 +171,10 @@ function Plot(props){
                     },
                     title: {
                         display: true,
-                        text: "TimeStamp (dd/MM/yyyy, HH:mm:ss)",
+                        text: "Timestamp (dd/MM/yyyy, HH:mm:ss)",
                         color: '#0057b3',
                         font: {
-                            family: 'Times New Roman',
+                            family: 'Helvetica',
                             weight: 'bold',
                         },
                     },
@@ -178,7 +194,7 @@ function Plot(props){
                         text: props.plotData.ylabel,
                         color: '#0057b3',
                         font: {
-                            family: 'Times New Roman',
+                            family: 'Helvetica',
                             weight: 'bold',
                         },
                     },
@@ -223,6 +239,15 @@ function Plot(props){
                 {
                     ...dataSetPlans,
                     data: props.plotData.plansData
+                }
+            )
+        }
+        if(props.plotData.simulationData !== undefined){
+            datasetsTemp.push(
+                {
+                    ...dataSetSimulation,
+                    label: "Simulation Values",
+                    data: props.plotData.simulationData
                 }
             )
         }

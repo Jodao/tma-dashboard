@@ -444,7 +444,7 @@ function CreateMetricPage(props){
                                 />
                             </Form.Group>
                             { metricToCreate["metricName"] === "" || metricToCreate.childMetrics.length === 0 ?
-                            <Label ribbon as='b' color='red'>
+                            <Label ribbon as='b' color='grey'>
                                 <Header as="h3"> Warning! </Header> 
                                 Metric tree will only be displayed once a name is given for the metric and, at least, one 
                                 child metric is selected

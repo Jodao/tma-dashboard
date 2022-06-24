@@ -479,13 +479,13 @@ function PlotResourceMetricsPage(){
                             data may appear in the plot if any arrive in the database.
                         </Label>
                     : formData.dataType === "metric" ?
-                        <Button onClick={simulateMetricsButtonHandler}>
+                        <Button color='blue' onClick={simulateMetricsButtonHandler}>
                             Simulate Metrics
                         </Button>
                     :
                         null
                     }
-                    <Button floated='right' onClick={exportPlotConfigsButtonHandler}>
+                    <Button color='grey' floated='right' onClick={exportPlotConfigsButtonHandler}>
                             Export Plot Config
                     </Button>
                     <p/>
@@ -570,7 +570,7 @@ function PlotResourceMetricsPage(){
                         </Step.Content>
                     </Step>
 
-                    <Step disabled = {step < 3} link>
+                    <Step completed = {step > 2} disabled = {step < 3} link>
                         <Step.Content>
                             <Step.Title>Plot data</Step.Title>
                         </Step.Content>

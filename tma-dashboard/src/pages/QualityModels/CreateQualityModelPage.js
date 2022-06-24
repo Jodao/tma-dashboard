@@ -7,6 +7,7 @@ import ValidInputs from '../../utils/ValidInputs'
 import CustomModal from '../../components/CustomModal';
 
 function CreateQualityModelPage(){
+
     const [metrics, setMetrics] = useState(null);
     const [formData,setFormData] = useState({});
     const [metricTreeData, setMetricTreeData] = useState(null);
@@ -77,8 +78,8 @@ function CreateQualityModelPage(){
     async function submitHandler(ev){
         ev.preventDefault()
         if (ValidInputs().validStringOrDropDownSelection(formData["modelName"])){
-            if(ValidInputs().validIntGreaterOrEqualThanZero(formData["modelDescriptionReference"]))
-                if(ValidInputs().validFloatBetweenZeroAndOne(formData["businessThreshold"]))
+            //if(ValidInputs().validIntGreaterOrEqualThanZero(formData["modelDescriptionReference"]))
+                //if(ValidInputs().validFloatBetweenZeroAndOne(formData["businessThreshold"]))
                     if(ValidInputs().validStringOrDropDownSelection(formData["metricId"])){
                         //process data into a format acceptable by the API
                         let postData = JSON.parse(JSON.stringify(formData))
@@ -126,11 +127,12 @@ function CreateQualityModelPage(){
                                         <Form.Field>
                                             <Form.Input fluid required
                                                 name="modelName"
-                                                label='modelName'
+                                                label='Name'
                                                 onChange={formFieldInputChangeHandler}
                                                 error={validInput("modelName")}
                                             />
                                         </Form.Field>
+                                        {/* uncomment to add model Description Reference and businessThreshold
                                         <Form.Field>
                                             <Form.Input fluid required
                                                 name="modelDescriptionReference" 
@@ -147,11 +149,7 @@ function CreateQualityModelPage(){
                                                 error={validInput("businessThreshold")}
                                             />
                                         </Form.Field>
-                                        <Form.Button color="grey" circular type='submit' floated="right" onClick={submitHandler}> 
-                                            Create Quality Model
-                                        </Form.Button>
-                                    </Form.Group>
-                                    <Form.Group>
+                                        */}
                                         <Form.Dropdown
                                             selectOnBlur={false}
                                             selectOnNavigation={false}
@@ -166,6 +164,9 @@ function CreateQualityModelPage(){
                                             name="metricId"
                                             error={validInput("metricId")}
                                         />
+                                        <Form.Button color="grey" circular type='submit' floated="right" onClick={submitHandler}> 
+                                            Create Quality Model
+                                        </Form.Button>
                                     </Form.Group>
                                 </Form>
                                 <Divider section horizontal>
@@ -174,7 +175,7 @@ function CreateQualityModelPage(){
                                 {metricTreeData !== null ?
                                 <TreeRender width={"100%"} height={"50vh"} data={metricTreeData}/>
                                 : 
-                                <Label active ribbon as='b' color='red'>
+                                <Label active ribbon as='b' color='grey'>
                                     <Header as="h3"> Warning! </Header> 
                                     Metrics tree will only be displayed once a metric is chosen
                                 </Label>

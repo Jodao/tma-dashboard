@@ -10,9 +10,10 @@ function ListQualityModelsPage(props){
     let navigate = useNavigate();
     const currpath = props["currpath"]
     
-    const tableBodyJSONProps = ["qualityModelId","modelName","modelDescriptionReference","businessThreshold",
-    "metricId","metricName"]; 
-    const tableHeaders = ["Id", "Name", "Description Reference", "Business Threshold", "Metric Id", "Metric Name"];
+    const tableBodyJSONProps = ["qualityModelId","modelName","metricId","metricName"]; 
+    //above add the following strings: "modelDescriptionReference","businessThreshold"
+    //and add below: "Description Reference", "Business Threshold" to show these properties
+    const tableHeaders = ["Id", "Name", "Metric Id", "Metric Name"];
 
     
     const [apiData, setAPIData] = useState(null);

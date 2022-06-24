@@ -168,7 +168,7 @@ function SimulateResourceMetricsPage(){
                 setServerResponseMessage(
                     {
                         messageType: "error",
-                        message: "Sibling metrics must have the sum of their weights equal to 1. Please, rectify the weights.",
+                        message: "Sibling metrics must have the sum of their weights equal to 1. Please, adjust the weights.",
                         openModal: true
                     }
                 )
@@ -198,7 +198,9 @@ function SimulateResourceMetricsPage(){
             let resData = await ApiModule().getSimulationData(requestBody)
             
             let newPlotData = JSON.parse(JSON.stringify(plotData))
-            newPlotData.dataSetMetric.data = resData
+            
+            newPlotData.simulationData = resData
+            //newPlotData.dataSetMetric.data = resData
             setPlotData(newPlotData)
             
             setLoadingSimulationData(false);

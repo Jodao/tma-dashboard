@@ -9,9 +9,9 @@ function ViewConfigurationProfilePage(props){
     const configurationProfileId = useParams()["id"];
     const tableHeaders = [
         "metricName", 
-        "weight",
-        "threshold"
+        "weight"
     ]
+    // add "threshold" above to visualize a node's threshold attribute
 
     //configurationProfile data received from API
     const [configurationProfile,setConfigurationProfile] = useState(null)
@@ -70,11 +70,13 @@ function ViewConfigurationProfilePage(props){
                         {preference.weight}
                     </Form.Field>
                 </Table.Cell>
+                {/* uncomment to visualize a node's threshold attribute
                 <Table.Cell key={uniqueId++}>
                     <Form.Field>
                         {preference.threshold}
                     </Form.Field>
                 </Table.Cell>
+                */}
             </Table.Row>
         )
     }
@@ -92,7 +94,7 @@ function ViewConfigurationProfilePage(props){
             </Grid>
             {configurationProfile !== null ?
                 <Container>
-                    <Grid columns={2}>
+                    <Grid stackable columns={2}>
                         <Grid.Column>
                             <Segment>
                                 <Header as="h3" textAlign="center"> Quality Model information</Header>
@@ -125,24 +127,32 @@ function ViewConfigurationProfilePage(props){
                                 <Header as="h3" textAlign="center"> Configuration Profile information</Header>
                                 <Divider/>
                                 <Form>
-                                    <Form.Group grouped>
-                                        <Form.Field width={8} >
+                                    <Form.Group widths="equal">
+                                        <Form.Field>
+                                            <label>Id:</label>
+                                            {configurationProfile["configurationProfileId"]}   
+                                        </Form.Field>
+                                        <Form.Field>
                                             <label>Name:</label>
                                             {configurationProfile["profileName"]}   
                                         </Form.Field>
-                                        <Divider section horizontal>
-                                            <Header as="h5" textAlign="center">Metrics weigths and thresholds</Header>     
-                                        </Divider>
-                                        <Table  
-                                        style = {{marginLeft: "auto", marginRight: "auto"}} 
-                                        textAlign="center" 
-                                        compact   
-                                        celled 
-                                        selectable> 
-                                            <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
-                                            {generateCustomTableBody()}
-                                        </Table> 
                                     </Form.Group>
+                                    <Divider section horizontal>
+                                        <Header as="h5" textAlign="center">Metrics weigths 
+                                        {/*uncomment to visualize thresholds
+                                            and thresholds
+                                        */}
+                                        </Header>     
+                                    </Divider>
+                                    <Table  
+                                    style = {{marginLeft: "auto", marginRight: "auto"}} 
+                                    textAlign="center" 
+                                    compact   
+                                    celled 
+                                    selectable> 
+                                        <TableHeader tableHeaders = {tableHeaders} ></TableHeader>
+                                        {generateCustomTableBody()}
+                                    </Table> 
                                 </Form>
                             </Segment>
                         </Grid.Column>

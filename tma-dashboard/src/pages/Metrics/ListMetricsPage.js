@@ -10,8 +10,10 @@ function ListMetricsPage(props){
     let navigate = useNavigate();
     const currpath = props["currpath"]
     
-    const tableHeaders = ["Id","Name","Block Level"] 
-    const tableBodyJSONProps = ["metricId","metricName","blockLevel"] 
+    const tableBodyJSONProps = ["metricId","metricName"] 
+    //above add the following strings: "blockLevel"
+    //and add below:"Block Level" to show these properties
+    const tableHeaders = ["Id","Name"] 
     
     const [apiData, setAPIData] = useState(null);
 

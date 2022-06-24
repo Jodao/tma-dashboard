@@ -75,10 +75,12 @@ function ViewMetricPage(){
                                         <label>Name:</label>
                                         {apiData["metricName"]}
                                     </Form.Field>
+                                    {/* uncomment to show Metric's "Block level" attribute
                                     <Form.Field>
                                         <label>Block Level:</label>
                                         {apiData["blockLevel"]}
                                     </Form.Field>
+                                    */}
                                     <Form.Field>
                                         <label>Leaf Attribute:</label>
                                         {

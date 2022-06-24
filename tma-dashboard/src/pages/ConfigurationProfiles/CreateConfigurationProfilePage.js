@@ -10,9 +10,9 @@ import CustomModal from '../../components/CustomModal';
 function CreateConfigurationProfilePage(){
     const tableHeaders = [
         "Name", 
-        <p>weight<font color='#990000'>*</font></p>,
-        <p>threshold<font color='#990000'>*</font></p>
+        <p>weight<font color='#990000'>*</font></p>
     ]
+    //add above: "<p>threshold<font color='#990000'>*</font></p> to show threshold on table form
 
     //formData
     const [preferences,setPreferences] = useState(null)
@@ -85,12 +85,14 @@ function CreateConfigurationProfilePage(){
                     error={validInput("weight",metric["metricId"])}
                     />
                 </Table.Cell>
+                {/* uncomment to add the "threshold" column to the table form
                 <Table.Cell key={uniqueId++}>
                     <Form.Input name="threshold" metricid={metric["metricId"]} 
                     onChange={formFieldInputChangeHandler} required
                     error={validInput("threshold",metric["metricId"])}
                     />
                 </Table.Cell>
+                */}
             </Table.Row>
         )
     }
@@ -157,8 +159,10 @@ function CreateConfigurationProfilePage(){
             let aux
             for(let metricId in preferences){
                 aux = ValidInputs().validFloatBetweenZeroAndOne(preferences[metricId]["weight"]) 
+                /* uncomment to add validation on "threshold" attribute
                 && ValidInputs().validFloatBetweenZeroAndOne(preferences[metricId]["threshold"]);
-                if(aux === false){
+                */
+               if(aux === false){
                     valid=false
                     break;
                 }
@@ -174,7 +178,7 @@ function CreateConfigurationProfilePage(){
                 setPostResponseMessage(
                     {
                         messageType: "error",
-                        message: "Sibling metrics must have the sum of their weights equal to 1. Please, rectify the weights.",
+                        message: "Sibling metrics must have the sum of their weights equal to 1. Please, adjust the weights.",
                         openModal: true
                     }
                 )
@@ -266,7 +270,11 @@ function CreateConfigurationProfilePage(){
                                     </Form.Button> 
                                 </Form.Group>
                                 <Divider section horizontal>
-                                    <Header as="h5" textAlign="center">Set metrics weigths and thresholds</Header>     
+                                    <Header as="h5" textAlign="center">Set metrics weigths 
+                                    {/* uncomment to add the text "and thresholds" to the interface
+                                        and thresholds
+                                    */}
+                                    </Header>     
                                 </Divider>
                                 {preferences !== null ?
                                     <Grid columns={1}>
