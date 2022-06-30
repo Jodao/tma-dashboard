@@ -311,7 +311,7 @@ function HomePage(){
             newState[plotsindex].plotData.dataSetMetric.data = res[0].listOfDataPoints
             
             if(config.addPlansInfo){
-                config.plansData = res[0].listOfPlansInfo
+                newState[plotsindex].plotData.plansData = res[0].listOfPlansInfo
             }
 
             newState[plotsindex].configObject.startDate = currDateMinus1Minute
@@ -515,7 +515,7 @@ function HomePage(){
                 <Grid.Row >
                     <Grid.Column width={15}>
                         <Divider  section horizontal>
-                            <Header as="h1" textAlign="center"> Imported Favourite Plots</Header> 
+                            <Header as="h1" textAlign="center"> Imported Favorite Plots</Header> 
                         </Divider>
                     </Grid.Column>
                 </Grid.Row>
