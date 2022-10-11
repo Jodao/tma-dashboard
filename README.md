@@ -13,7 +13,7 @@ This is a decision support tool, more precisely a dashboard developed as a web p
 # Index
 
  -   [Installation](#Installation)
- -   [Properties](#API-communication-setup)
+ -   [API communication setup](#API-communication-setup)
  -   [Implementation Details](#Implementation-Details)
 
 ## Installation
@@ -30,7 +30,7 @@ To deploy the image built in the previous step as a pod in the kubernetes cluste
 kubectl create -f tma-dashboard-deployment.yaml
 ```
 
-Now, to interact with the tool you should access the URL ```http://IP_WORKER:31000/´´´. In case your ISP is blocking the traffic on that port, use the *externalIP* feature of Kubernetes to expose the web server at the URL ```http://EXTERNAL_IP_DEFINED:80/´´´.
+Now, to interact with the tool you should access the URL **http://IP_WORKER:31000/**. In case your ISP is blocking the traffic on that port, use the *externalIP* feature of Kubernetes to expose the web server at the URL **http://EXTERNAL_IP_DEFINED:80/**.
 
 ## API communication setup
 
