@@ -30,7 +30,7 @@ To deploy the image built in the previous step as a pod in the kubernetes cluste
 kubectl create -f tma-dashboard-deployment.yaml
 ```
 
-Now, to interact with the tool you should access the URL: `http://IP_WORKER:31000/`. In case your ISP is blocking the traffic on that port, use the *externalIP* feature of Kubernetes to expose the web server at the URL `http://EXTERNAL_IP_DEFINED:80/`.
+Now, to interact with the tool you should access the URL: `http://IP_WORKER:31000/`. In case your ISP is blocking the traffic on that port, use the *externalIP* feature of Kubernetes to expose the web server at the URL: `http://EXTERNAL_IP_DEFINED:80/`.
 
 ## API communication setup
 
@@ -53,7 +53,7 @@ The webpage uses libraries to provide some of its main features:
  -  `Reaflow`, with few customization, to generate the tree structure of quality models
  -  `jsPDF` to generate a pdf file with a chart image
  
-To communicate with TMA's API, the `axios` library is used and a module ([ApiModule.js](tma-dashboard/src/utils/api/ApiModule.js)) contains all the communication methods. Also, the client-side input validation resides in [ApiModule.js](tma-dashboard/src/utils/ValidInputs.js) file.
+To communicate with TMA's API, the `axios` library is used and a module ([ApiModule.js](tma-dashboard/src/utils/api/ApiModule.js)) contains all the communication methods. Also, the client-side input validation resides in [ValidInputs.js](tma-dashboard/src/utils/ValidInputs.js) file.
 
 ## Authors
 * João Ribeiro
