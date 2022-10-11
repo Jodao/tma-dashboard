@@ -30,11 +30,11 @@ To deploy the image built in the previous step as a pod in the kubernetes cluste
 kubectl create -f tma-dashboard-deployment.yaml
 ```
 
-Now, to interact with the tool you should access the URL **http://IP_WORKER:31000/**. In case your ISP is blocking the traffic on that port, use the *externalIP* feature of Kubernetes to expose the web server at the URL **http://EXTERNAL_IP_DEFINED:80/**.
+Now, to interact with the tool you should access the URL: `http://IP_WORKER:31000/`. In case your ISP is blocking the traffic on that port, use the *externalIP* feature of Kubernetes to expose the web server at the URL `http://EXTERNAL_IP_DEFINED:80/`.
 
 ## API communication setup
 
-The IP address and port of TMA's API (URL_API_TMA), where requests from this tool will be sent to, are configured in [Configurations.js file](tma-dashboard/src/configurations/Configurations.js), under the following directory:
+The IP address and port of TMA's API (URL_API_TMA), where requests from this tool will be sent to, are configured in [Configurations.js](tma-dashboard/src/configurations/Configurations.js) file, under the following directory:
 
 ```
 ...\tma-dashboard\src\configurations\
