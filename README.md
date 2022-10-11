@@ -44,7 +44,16 @@ With the default deploy of TMA's API, the IP address and port of this configurat
 
 ## Implementation Details
 
-This webpage was created in the form of a SPA (Single Page Application) using React, and Semantic UI for styling. Its functioning is based on performing requests to TMA's API (URL_API_TMA) whenever it needs data. Additionally, requests related to adaptation rules are redirected to and from TMA's Planning API (URL_PLANNING). Whenever requests sent from the webpage involve timestamps, they are converted to UTC before arriving at the API.
+This webpage was created in the form of a SPA (Single Page Application) using React, and Semantic UI for styling. 
+
+Its functioning is based on performing requests to TMA's API (URL_API_TMA) whenever it needs data. Additionally, requests related to adaptation rules are redirected to and from TMA's Planning API (URL_PLANNING). Whenever requests sent from the webpage involve timestamps, they are converted to UTC before arriving at the API.
+
+The webpage uses libraries to provide some of its main features:
+ -  `Chart.js` to create charts
+ -  `Reaflow`, with few customization, to generate the tree structure of quality models
+ -  `jsPDF` to generate a pdf file with a chart image
+ 
+To communicate with TMA's API, the `axios` library is used and a module ([ApiModule.js](tma-dashboard/src/utils/api/ApiModule.js)) contains all the communication methods. Also, the client-side input validation resides in [ApiModule.js](tma-dashboard/src/utils/ValidInputs.js) file.
 
 ## Authors
 * João Ribeiro
