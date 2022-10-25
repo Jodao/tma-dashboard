@@ -36,6 +36,8 @@ function TablePagination(props){
     }
     
     return(
+        null
+        /* uncomment and remove "null" from above to show pagination menu
         <Table.Footer>
             <Table.Row>
                 <Table.HeaderCell colSpan={props["numberOfColumns"]}>
@@ -64,7 +66,7 @@ function TablePagination(props){
                     </Menu>
                 </Table.HeaderCell>
             </Table.Row>
-        </Table.Footer>
+        </Table.Footer>*/
     )
 }
 
